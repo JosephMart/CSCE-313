@@ -17,6 +17,8 @@
 /*--------------------------------------------------------------------------*/
 
 /* -- (none) -- */
+static char *start;
+static unsigned int remaining;
 
 /*--------------------------------------------------------------------------*/
 /* INCLUDES */
@@ -50,10 +52,10 @@
 /* Don't forget to implement "init_allocator" and "release_allocator"! */
 unsigned int init_allocator(unsigned int _basic_block_size,
                             unsigned int _length) {
-    Addr address = my_malloc(_length);
-    address++;
+    start = (char*) malloc(_length);
+    remaining = _length;
 
-    return 0;
+    return (start) ? _length : 0;
 }
 
 
@@ -62,7 +64,13 @@ Addr my_malloc(size_t _length) {
        the C standard librarinity!
        Of course this needs to be replaced by your implementation.
     */
-    return malloc(_length);
+    if (_length <= remaining) {
+        Addr old_start = (Addr)(start);
+        start = start + _length;
+        remaining = remaining - (unsigned int)(_length);
+        return old_start;
+    }
+    return NULL;
 }
 
 int my_free(Addr _a) {

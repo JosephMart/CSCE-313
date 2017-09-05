@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/joseph/Documents/CSCE-313/mp1-clion/memtest.c
+stdlib.h
+-
+stdio.h
+-
+string.h
+-
+sys/time.h
+-
+assert.h
+-
+getopt.h
+-
+my_allocator.h
+/home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.h
+
+/home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.c
+stdlib.h
+-
+my_allocator.h
+/home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.h
+
+/home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.h
+
