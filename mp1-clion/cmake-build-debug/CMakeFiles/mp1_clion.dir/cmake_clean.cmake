@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/mp1_clion.dir/memtest.c.o"
   "CMakeFiles/mp1_clion.dir/my_allocator.c.o"
+  "CMakeFiles/mp1_clion.dir/free_list.c.o"
   "mp1_clion.pdb"
   "mp1_clion"
 )

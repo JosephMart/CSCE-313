@@ -1,7 +1,7 @@
 /* 
     File: my_allocator.c
 
-    Author: <your name>
+    Author: Joseph Martinsen
             Department of Computer Science
             Texas A&M University
     Date  : <date>
@@ -17,8 +17,6 @@
 /*--------------------------------------------------------------------------*/
 
 /* -- (none) -- */
-static char *start;
-static unsigned int remaining;
 
 /*--------------------------------------------------------------------------*/
 /* INCLUDES */
@@ -26,6 +24,8 @@ static unsigned int remaining;
 
 #include<stdlib.h>
 #include "my_allocator.h"
+#include "free_list.h"
+
 
 /*--------------------------------------------------------------------------*/
 /* DATA STRUCTURES */
@@ -37,7 +37,11 @@ static unsigned int remaining;
 /* CONSTANTS */
 /*--------------------------------------------------------------------------*/
 
-/* -- (none) -- */
+static char *start;
+static unsigned int remaining;
+
+// Points to head of the linked list
+static FL_HEADER* HLL;
 
 /*--------------------------------------------------------------------------*/
 /* FORWARDS */

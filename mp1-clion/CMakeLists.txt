@@ -3,5 +3,5 @@ project(mp1_clion)
 
 set(CMAKE_C_STANDARD 11)
 
-set(SOURCE_FILES memtest.c my_allocator.c my_allocator.h)
+set(SOURCE_FILES memtest.c my_allocator.c my_allocator.h free_list.h free_list.c)
 add_executable(mp1_clion ${SOURCE_FILES})

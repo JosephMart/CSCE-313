@@ -123,6 +123,33 @@ mp1_clion/fast:
 	$(MAKE) -f CMakeFiles/mp1_clion.dir/build.make CMakeFiles/mp1_clion.dir/build
 .PHONY : mp1_clion/fast
 
+free_list.o: free_list.c.o
+
+.PHONY : free_list.o
+
+# target to build an object file
+free_list.c.o:
+	$(MAKE) -f CMakeFiles/mp1_clion.dir/build.make CMakeFiles/mp1_clion.dir/free_list.c.o
+.PHONY : free_list.c.o
+
+free_list.i: free_list.c.i
+
+.PHONY : free_list.i
+
+# target to preprocess a source file
+free_list.c.i:
+	$(MAKE) -f CMakeFiles/mp1_clion.dir/build.make CMakeFiles/mp1_clion.dir/free_list.c.i
+.PHONY : free_list.c.i
+
+free_list.s: free_list.c.s
+
+.PHONY : free_list.s
+
+# target to generate assembly for a file
+free_list.c.s:
+	$(MAKE) -f CMakeFiles/mp1_clion.dir/build.make CMakeFiles/mp1_clion.dir/free_list.c.s
+.PHONY : free_list.c.s
+
 memtest.o: memtest.c.o
 
 .PHONY : memtest.o
@@ -186,6 +213,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... mp1_clion"
+	@echo "... free_list.o"
+	@echo "... free_list.i"
+	@echo "... free_list.s"
 	@echo "... memtest.o"
 	@echo "... memtest.i"
 	@echo "... memtest.s"
