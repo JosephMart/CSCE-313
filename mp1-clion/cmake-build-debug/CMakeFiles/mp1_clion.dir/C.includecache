@@ -6,6 +6,14 @@
 
 #IncludeRegexTransform: 
 
+/home/joseph/Documents/CSCE-313/mp1-clion/free_list.c
+stddef.h
+-
+free_list.h
+/home/joseph/Documents/CSCE-313/mp1-clion/free_list.h
+
+/home/joseph/Documents/CSCE-313/mp1-clion/free_list.h
+
 /home/joseph/Documents/CSCE-313/mp1-clion/memtest.c
 stdlib.h
 -
@@ -27,6 +35,10 @@ stdlib.h
 -
 my_allocator.h
 /home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.h
+free_list.h
+/home/joseph/Documents/CSCE-313/mp1-clion/free_list.h
+stdio.h
+-
 
 /home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.h
 

@@ -112,16 +112,16 @@ int main(int argc, char **argv) {
 
     // Initialize the allocator by calling: init_allocator(basic block size, memory length)
     init_allocator(block_size, mem_size);
-    printf("%d\n",init_allocator(10,100));
+//    printf("%d\n",init_allocator(10,100));
     printf("%d\n",my_malloc(6));
-    printf("%d\n",my_malloc(10));
-    printf("%d\n",my_malloc(10000));
-    ackerman_main();
+//    printf("%d\n",my_malloc(10));
+//    printf("%d\n",my_malloc(10000));
+//    ackerman_main();
 
     return 0;
 
     // Release the memory in the allocator by calling: release_allocator()
-
+    // release_allocator();
 }
 
 /*--------------------------------------------------------------------------*/
