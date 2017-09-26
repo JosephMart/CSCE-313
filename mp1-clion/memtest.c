@@ -113,10 +113,11 @@ int main(int argc, char **argv) {
     // Initialize the allocator by calling: init_allocator(basic block size, memory length)
     init_allocator(block_size, mem_size);
 //    printf("%d\n",init_allocator(10,100));
-    printf("%d\n",my_malloc(6));
-//    printf("%d\n",my_malloc(10));
-//    printf("%d\n",my_malloc(10000));
-//    ackerman_main();
+    Addr test = my_malloc(640);
+    printf("%p\n",test);
+    my_free(test);
+    printf("%p\n",my_malloc(64));
+    ackerman_main();
 
     return 0;
 
