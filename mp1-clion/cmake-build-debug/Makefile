@@ -204,6 +204,33 @@ my_allocator.c.s:
 	$(MAKE) -f CMakeFiles/mp1_clion.dir/build.make CMakeFiles/mp1_clion.dir/my_allocator.c.s
 .PHONY : my_allocator.c.s
 
+utils.o: utils.c.o
+
+.PHONY : utils.o
+
+# target to build an object file
+utils.c.o:
+	$(MAKE) -f CMakeFiles/mp1_clion.dir/build.make CMakeFiles/mp1_clion.dir/utils.c.o
+.PHONY : utils.c.o
+
+utils.i: utils.c.i
+
+.PHONY : utils.i
+
+# target to preprocess a source file
+utils.c.i:
+	$(MAKE) -f CMakeFiles/mp1_clion.dir/build.make CMakeFiles/mp1_clion.dir/utils.c.i
+.PHONY : utils.c.i
+
+utils.s: utils.c.s
+
+.PHONY : utils.s
+
+# target to generate assembly for a file
+utils.c.s:
+	$(MAKE) -f CMakeFiles/mp1_clion.dir/build.make CMakeFiles/mp1_clion.dir/utils.c.s
+.PHONY : utils.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -222,6 +249,9 @@ help:
 	@echo "... my_allocator.o"
 	@echo "... my_allocator.i"
 	@echo "... my_allocator.s"
+	@echo "... utils.o"
+	@echo "... utils.i"
+	@echo "... utils.s"
 .PHONY : help
 
 

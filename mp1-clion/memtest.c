@@ -28,6 +28,7 @@
 #include<sys/time.h>
 #include<assert.h>
 #include <getopt.h>
+#include <math.h>
 
 #include "my_allocator.h"
 
@@ -113,11 +114,11 @@ int main(int argc, char **argv) {
     // Initialize the allocator by calling: init_allocator(basic block size, memory length)
     init_allocator(block_size, mem_size);
 //    printf("%d\n",init_allocator(10,100));
-    Addr test = my_malloc(640);
+    Addr test = my_malloc(64);
     printf("%p\n",test);
-    my_free(test);
-    printf("%p\n",my_malloc(64));
-    ackerman_main();
+//    my_free(test);
+//    printf("%p\n",my_malloc(64));
+//    ackerman_main();
 
     return 0;
 

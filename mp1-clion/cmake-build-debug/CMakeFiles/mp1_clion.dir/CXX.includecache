@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/joseph/Documents/CSCE-313/mp1-clion/utils.cpp
+math.h
+-
+utils.h
+/home/joseph/Documents/CSCE-313/mp1-clion/utils.h
+
+/home/joseph/Documents/CSCE-313/mp1-clion/utils.h
+

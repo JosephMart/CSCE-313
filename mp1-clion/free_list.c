@@ -15,6 +15,7 @@
 #include <stddef.h>
 #include "free_list.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void FL_remove(FL_HEADER **list_head, FL_HEADER *block) {
     if ((*list_head)->tail == NULL) {

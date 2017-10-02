@@ -10,4 +10,9 @@ CMakeFiles/mp1_clion.dir/memtest.c.o: ../my_allocator.h
 CMakeFiles/mp1_clion.dir/my_allocator.c.o: ../free_list.h
 CMakeFiles/mp1_clion.dir/my_allocator.c.o: ../my_allocator.c
 CMakeFiles/mp1_clion.dir/my_allocator.c.o: ../my_allocator.h
+CMakeFiles/mp1_clion.dir/my_allocator.c.o: ../utils.h
+
+CMakeFiles/mp1_clion.dir/utils.c.o: ../free_list.h
+CMakeFiles/mp1_clion.dir/utils.c.o: ../utils.c
+CMakeFiles/mp1_clion.dir/utils.c.o: ../utils.h
 

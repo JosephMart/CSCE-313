@@ -13,6 +13,8 @@ free_list.h
 /home/joseph/Documents/CSCE-313/mp1-clion/free_list.h
 stdio.h
 -
+stdlib.h
+-
 
 /home/joseph/Documents/CSCE-313/mp1-clion/free_list.h
 
@@ -29,18 +31,40 @@ assert.h
 -
 getopt.h
 -
+math.h
+-
 my_allocator.h
 /home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.h
 
 /home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.c
 stdlib.h
 -
+math.h
+-
 my_allocator.h
 /home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.h
 free_list.h
 /home/joseph/Documents/CSCE-313/mp1-clion/free_list.h
+utils.h
+/home/joseph/Documents/CSCE-313/mp1-clion/utils.h
 stdio.h
 -
 
 /home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.h
+
+/home/joseph/Documents/CSCE-313/mp1-clion/utils.c
+math.h
+-
+stddef.h
+-
+stdio.h
+-
+utils.h
+/home/joseph/Documents/CSCE-313/mp1-clion/utils.h
+free_list.h
+/home/joseph/Documents/CSCE-313/mp1-clion/free_list.h
+
+/home/joseph/Documents/CSCE-313/mp1-clion/utils.h
+free_list.h
+/home/joseph/Documents/CSCE-313/mp1-clion/free_list.h
 

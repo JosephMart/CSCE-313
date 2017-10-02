@@ -95,6 +95,12 @@
 		<Unit filename="/home/joseph/Documents/CSCE-313/mp1-clion/my_allocator.h">
 			<Option target="mp1_clion"/>
 		</Unit>
+		<Unit filename="/home/joseph/Documents/CSCE-313/mp1-clion/utils.c">
+			<Option target="mp1_clion"/>
+		</Unit>
+		<Unit filename="/home/joseph/Documents/CSCE-313/mp1-clion/utils.h">
+			<Option target="mp1_clion"/>
+		</Unit>
 		<Unit filename="/home/joseph/Documents/CSCE-313/mp1-clion/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
