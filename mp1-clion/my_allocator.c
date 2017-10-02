@@ -107,20 +107,29 @@ unsigned int init_allocator(unsigned int _basic_block_size,
         binary_check /= 10;
     }
 
-    // test printing
+    // WHY DOES THIS WORK
+    long long int sum = 0;
     for(int i = 0; i < 12; i++){
-        printf("header_test_len: %zu\n", FREE_LIST_ARRAY[i]->length);
+        printf("header_test_len: %zu", FREE_LIST_ARRAY[i]->length);
+        if(FREE_LIST_ARRAY[i]->tail) {
+            sum += FREE_LIST_ARRAY[i]->length;
+            printf("\t EXTRA BLOCK CREATED");
+        }
+        printf("\n");
     }
+    printf("Sum of Blocks Created: %llu\n\n", sum);
     return 0;
 }
 
 Addr my_malloc(size_t _length) {
     // Find a block of appropriate size
 
+    // WHY DOES THIS NOT WORK
     for(int i = 0; i < 12; i++){
-//        int test2 = i;
-        size_t test = FREE_LIST_ARRAY[i]->length;
-        printf("header_test_len: %zu\n", test);
+        if(i) {
+            printf("i:%d\n", i);
+            printf("header_test_len: %zu\n", FREE_LIST_ARRAY[i]->length);
+        }
     }
 
 //    for(int i = 0; i < 3; i++){
@@ -128,7 +137,7 @@ Addr my_malloc(size_t _length) {
 //        int lol = (int) i;
 //        printf("header_test_len: %zu\n", FREE_LIST_ARRAY[lol]->length);
 //    }
-//    int index = get_index(_length, FREE_LIST_ARRAY);
+    int index = get_index(_length, FREE_LIST_ARRAY);
 //    fprintf("\n\nindex: %d", index);
     return (Addr) FREE_LIST_ARRAY[0];
 
