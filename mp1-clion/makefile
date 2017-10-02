@@ -1,6 +1,7 @@
 # makefile
 
-all: memtest
+all:
+	gcc -lm -O0 -o memtest *.c
 
 utils.o: utils.c
 	gcc -c -g -lm utils.c

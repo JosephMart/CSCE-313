@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void FL_remove(FL_HEADER **list_head, FL_HEADER *block) {
+FL_HEADER* FL_remove(FL_HEADER **list_head, FL_HEADER *block) {
     if ((*list_head)->tail == NULL) {
         *list_head = NULL;
     } else if (block->head == NULL) {
@@ -33,19 +33,20 @@ void FL_remove(FL_HEADER **list_head, FL_HEADER *block) {
     // Clear head and tail in block
     block->head = NULL;
     block->tail = NULL;
+    return block;
 }
 
-void FL_add(FL_HEADER **free_list, FL_HEADER *block) {
+void FL_add(FL_HEADER **free_list_array, FL_HEADER *block) {
     // Travers to the end of the free_list
-    if (*free_list == NULL) {
-        *free_list = block;
+    if (*free_list_array == NULL) {
+        *free_list_array= block;
         return;
     }
 
-    (*free_list)->head = block;
+    (*free_list_array)->head = block;
     block->head = NULL;
-    block->tail = *free_list;
-    *free_list = block;
+    block->tail = *free_list_array;
+    *free_list_array = block;
 }
 
 FL_HEADER* FL_split(FL_HEADER **free_list, FL_HEADER *block, size_t mem_size) {

@@ -59,6 +59,7 @@ void ackerman_main();
 */
 
 int ackerman(int a, int b);
+int fib(int a);
 
 /* This is the implementation of the Ackerman function. The function itself is very
    simple (just two recursive calls). We use it to exercise the memory allocator 
@@ -149,20 +150,16 @@ void ackerman_main() {
         num_allocations = 0;
 
         printf("\n");
-        printf("Please enter parameters 'a' and 'b' to ackerman function.\n");
+        printf("Please enter parameter 'a' to fib function.\n");
         printf("Note that this function takes a long time to compute,\n");
         printf("even for small values. Keep 'a' at or below 3, and 'b' at or\n");
-        printf("below 8. Otherwise, the function takes seemingly forever.\n");
-        printf("Enter 0 for either 'a' or 'b' in order to exit.\n\n");
+        printf("Enter 0 for either 'a' in order to exit.\n\n");
 
         printf("  a = ");
         scanf("%d", &a);
         if (!a) break;
-        printf("  b = ");
-        scanf("%d", &b);
-        if (!b) break;
 
-        printf("      a = %d, b = %d\n", a, b);
+        printf("      a = %d\n", a);
 
         assert(gettimeofday(&tp_start, 0) == 0);
         /* Assert aborts if there is a problem with gettimeofday.
@@ -170,7 +167,7 @@ void ackerman_main() {
            invalid timing information!
         */
 
-        int result = ackerman(a, b); /* We really don't care about the result. It's like Zen:
+        int result = fib(a); /* We really don't care about the result. It's like Zen:
                                     It's the way there that counts; not the result that we find there. */
 
         assert(gettimeofday(&tp_end, 0) == 0);
@@ -188,6 +185,64 @@ void ackerman_main() {
     printf("Reached end of Ackerman program. Thank you for using it.\n");
 
 }
+
+/*--------------------------------------------------------------------------*/
+/* IMPLEMENTATION OF FIB FUNCTION */
+/*--------------------------------------------------------------------------*/
+
+int fib(int a) {
+/* This is the implementation of the Ackerman function. The function itself is very
+   simple (just two recursive calls). We use it to exercise the memory allocator
+   (see "my_alloc" and "my_free").
+   We use two additional calls to "gettimeofday" to measure the elapsed time.
+*/
+
+    /* Choose randomly the size of the memory to allocate: */
+    int to_alloc = ((2 << (rand() % 19)) * (rand() % 100)) / 100;
+    if (to_alloc < 4) to_alloc = 4;
+
+    int result = 0;
+
+    /* Here we allocate the memory using our own allocator. */
+    char *mem = (char *) my_malloc(to_alloc * sizeof(char));
+
+    num_allocations++;
+
+    if (mem == NULL) {
+
+        printf("ALLOCATOR FAILED: PROBABLY OUT OF MEMORY.\n");
+
+    } else {
+
+        /* Fill the allocated memory with a value. This same value will be used later for testing. */
+        char c = rand() % 128;
+        memset(mem, c, to_alloc * sizeof(char));
+
+        /* Here we do the FIB recursion thing. */
+        if (a == 0)
+            result = 0;
+        else if (a == 1)
+            result = 1;
+        else
+            result = fib(a - 1) + fib(a - 2);
+
+        /* We returned from recursion. Now let's check if the memory allocated above still has the same value. */
+        for (int i = 0; i < to_alloc; i++) {
+            if (mem[i] != c) {
+                /* The value does not match. It must have been overwritten somewhere. This is very bad. */
+                printf("Memory checking error!\n");
+                break;
+            }
+        }
+
+        /* Now we free the memory allocated above; we use our own allocator. */
+        my_free(mem);
+    }
+
+    return result; /* Generally the FIb function returns a value. We don't really care for it. */
+}
+
+
 
 /*--------------------------------------------------------------------------*/
 /* IMPLEMENTATION OF ACKERMAN FUNCTION */

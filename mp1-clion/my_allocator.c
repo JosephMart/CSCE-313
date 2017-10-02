@@ -77,13 +77,10 @@ unsigned int init_allocator(unsigned int _basic_block_size,
         iter++;
     }
 
-    printf("\nbinary_check: %ld\n\n", sizeof(FL_HEADER));
+    printf("\nbinary_check: %ld\n\n", binary_check);
     int digit_count = (int) get_digit_count(binary_check);
 
     for (int i = 0; i < digit_count; i++) {
-//        printf("MEMORY ADDRESS: %p\n", (void*) &FREE_LIST_ARRAY[i]);
-//        FL_HEADER *current_block = FREE_LIST_ARRAY[i];
-
         // Create the header
         size_t _len = (size_t) pow(2, power_2_bbs + i);
         FL_HEADER *current_block = malloc(sizeof(FL_HEADER));
@@ -124,44 +121,33 @@ unsigned int init_allocator(unsigned int _basic_block_size,
 Addr my_malloc(size_t _length) {
     // Find a block of appropriate size
 
-    // WHY DOES THIS NOT WORK
+    // WHY DOES THIS NOT WORK - i gets optimized out............. :(
+    long long int sum = 0;
     for(int i = 0; i < 12; i++){
-        if(i) {
-            printf("i:%d\n", i);
-            printf("header_test_len: %zu\n", FREE_LIST_ARRAY[i]->length);
+        FL_HEADER *temp = FREE_LIST_ARRAY[i];
+        printf("header_test_len: %zu", temp->length);
+        if(FREE_LIST_ARRAY[i]->tail) {
+            sum += FREE_LIST_ARRAY[i]->length;
+            printf("\t EXTRA BLOCK CREATED");
         }
+        printf("\n");
     }
+    printf("Sum of Blocks Created: %llu\n\n", sum);
 
-//    for(int i = 0; i < 3; i++){
-//        printf("\ni:%i\n",i);
-//        int lol = (int) i;
-//        printf("header_test_len: %zu\n", FREE_LIST_ARRAY[lol]->length);
-//    }
     int index = get_index(_length, FREE_LIST_ARRAY);
-//    fprintf("\n\nindex: %d", index);
-    return (Addr) FREE_LIST_ARRAY[0];
-
-//    FL_HEADER *current = FREE_LIST_HEAD;
-//    while (current->length < _length + FL_HEADER_SIZE) {
-//        if (current->tail == NULL) {
-//            return 0;
-//        }
-//        current = current->tail;
-//    }
-//
-//    FL_remove(&FREE_LIST_HEAD, current);
-//
-//    // Split the block as needed
-//    if (current->length > _length + FL_HEADER_SIZE) {
-//        FL_split(&FREE_LIST_HEAD, current, _length);
-//    }
-//    Addr return_val = (Addr) ((char*) current + FL_HEADER_SIZE);
-//    return return_val;
+    FL_HEADER *free_list_row = FREE_LIST_ARRAY[index];
+    if (free_list_row->length > _length) {
+        // if row needs to be split
+        return (Addr) FL_split(&free_list_row, free_list_row->tail, _length) - sizeof(FL_HEADER);
+    } else {
+        // Size is just what the doctor ordered
+        return (Addr) FL_remove(&free_list_row, free_list_row->tail) - sizeof(FL_HEADER);
+    }
 }
 
 int my_free(Addr _a) {
-    FL_HEADER *block = (FL_HEADER *) ((char *) _a - FL_HEADER_SIZE);
-    FL_add(&FREE_LIST_HEAD, block);
+    FL_HEADER *block = (FL_HEADER *) ((char *) _a + FL_HEADER_SIZE);
+    FL_add(&FREE_LIST_ARRAY, block);
     return 0;
 }
 
