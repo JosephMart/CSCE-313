@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/joseph/Documents/CSCE-313/mp2/client.c
+cassert
+-
+string
+-
+iostream
+-
+sstream
+-
+sys/types.h
+-
+sys/stat.h
+-
+errno.h
+-
+unistd.h
+-
+reqchannel.H
+/home/joseph/Documents/CSCE-313/mp2/reqchannel.H
+
+/home/joseph/Documents/CSCE-313/mp2/reqchannel.H
+iostream
+-
+fstream
+-
+string
+-
+

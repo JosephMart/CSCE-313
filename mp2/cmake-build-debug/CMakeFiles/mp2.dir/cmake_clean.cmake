@@ -1,8 +1,7 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/mp2.dir/dataserver.C.o"
   "CMakeFiles/mp2.dir/mutex.C.o"
   "CMakeFiles/mp2.dir/reqchannel.C.o"
-  "CMakeFiles/mp2.dir/simpleclient.C.o"
+  "CMakeFiles/mp2.dir/client.cpp.o"
   "mp2.pdb"
   "mp2"
 )

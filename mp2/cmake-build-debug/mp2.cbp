@@ -80,7 +80,7 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/joseph/Documents/CSCE-313/mp2/dataserver.C">
+		<Unit filename="/home/joseph/Documents/CSCE-313/mp2/client.cpp">
 			<Option target="mp2"/>
 		</Unit>
 		<Unit filename="/home/joseph/Documents/CSCE-313/mp2/mutex.C">
@@ -99,9 +99,6 @@
 			<Option target="mp2"/>
 		</Unit>
 		<Unit filename="/home/joseph/Documents/CSCE-313/mp2/semaphore.H">
-			<Option target="mp2"/>
-		</Unit>
-		<Unit filename="/home/joseph/Documents/CSCE-313/mp2/simpleclient.C">
 			<Option target="mp2"/>
 		</Unit>
 		<Unit filename="/home/joseph/Documents/CSCE-313/mp2/CMakeLists.txt">

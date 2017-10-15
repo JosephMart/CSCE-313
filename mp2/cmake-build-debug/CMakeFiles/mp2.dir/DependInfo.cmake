@@ -4,10 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/joseph/Documents/CSCE-313/mp2/dataserver.C" "/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles/mp2.dir/dataserver.C.o"
+  "/home/joseph/Documents/CSCE-313/mp2/client.cpp" "/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles/mp2.dir/client.cpp.o"
   "/home/joseph/Documents/CSCE-313/mp2/mutex.C" "/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles/mp2.dir/mutex.C.o"
   "/home/joseph/Documents/CSCE-313/mp2/reqchannel.C" "/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles/mp2.dir/reqchannel.C.o"
-  "/home/joseph/Documents/CSCE-313/mp2/simpleclient.C" "/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles/mp2.dir/simpleclient.C.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

@@ -57,33 +57,9 @@ include CMakeFiles/mp2.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/mp2.dir/flags.make
 
-CMakeFiles/mp2.dir/dataserver.C.o: CMakeFiles/mp2.dir/flags.make
-CMakeFiles/mp2.dir/dataserver.C.o: ../dataserver.C
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/mp2.dir/dataserver.C.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mp2.dir/dataserver.C.o -c /home/joseph/Documents/CSCE-313/mp2/dataserver.C
-
-CMakeFiles/mp2.dir/dataserver.C.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mp2.dir/dataserver.C.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/joseph/Documents/CSCE-313/mp2/dataserver.C > CMakeFiles/mp2.dir/dataserver.C.i
-
-CMakeFiles/mp2.dir/dataserver.C.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mp2.dir/dataserver.C.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/joseph/Documents/CSCE-313/mp2/dataserver.C -o CMakeFiles/mp2.dir/dataserver.C.s
-
-CMakeFiles/mp2.dir/dataserver.C.o.requires:
-
-.PHONY : CMakeFiles/mp2.dir/dataserver.C.o.requires
-
-CMakeFiles/mp2.dir/dataserver.C.o.provides: CMakeFiles/mp2.dir/dataserver.C.o.requires
-	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/dataserver.C.o.provides.build
-.PHONY : CMakeFiles/mp2.dir/dataserver.C.o.provides
-
-CMakeFiles/mp2.dir/dataserver.C.o.provides.build: CMakeFiles/mp2.dir/dataserver.C.o
-
-
 CMakeFiles/mp2.dir/mutex.C.o: CMakeFiles/mp2.dir/flags.make
 CMakeFiles/mp2.dir/mutex.C.o: ../mutex.C
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/mp2.dir/mutex.C.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/mp2.dir/mutex.C.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mp2.dir/mutex.C.o -c /home/joseph/Documents/CSCE-313/mp2/mutex.C
 
 CMakeFiles/mp2.dir/mutex.C.i: cmake_force
@@ -107,7 +83,7 @@ CMakeFiles/mp2.dir/mutex.C.o.provides.build: CMakeFiles/mp2.dir/mutex.C.o
 
 CMakeFiles/mp2.dir/reqchannel.C.o: CMakeFiles/mp2.dir/flags.make
 CMakeFiles/mp2.dir/reqchannel.C.o: ../reqchannel.C
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/mp2.dir/reqchannel.C.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/mp2.dir/reqchannel.C.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mp2.dir/reqchannel.C.o -c /home/joseph/Documents/CSCE-313/mp2/reqchannel.C
 
 CMakeFiles/mp2.dir/reqchannel.C.i: cmake_force
@@ -129,47 +105,45 @@ CMakeFiles/mp2.dir/reqchannel.C.o.provides: CMakeFiles/mp2.dir/reqchannel.C.o.re
 CMakeFiles/mp2.dir/reqchannel.C.o.provides.build: CMakeFiles/mp2.dir/reqchannel.C.o
 
 
-CMakeFiles/mp2.dir/simpleclient.C.o: CMakeFiles/mp2.dir/flags.make
-CMakeFiles/mp2.dir/simpleclient.C.o: ../simpleclient.C
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/mp2.dir/simpleclient.C.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mp2.dir/simpleclient.C.o -c /home/joseph/Documents/CSCE-313/mp2/simpleclient.C
+CMakeFiles/mp2.dir/client.cpp.o: CMakeFiles/mp2.dir/flags.make
+CMakeFiles/mp2.dir/client.cpp.o: ../client.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/mp2.dir/client.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/mp2.dir/client.cpp.o -c /home/joseph/Documents/CSCE-313/mp2/client.cpp
 
-CMakeFiles/mp2.dir/simpleclient.C.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mp2.dir/simpleclient.C.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/joseph/Documents/CSCE-313/mp2/simpleclient.C > CMakeFiles/mp2.dir/simpleclient.C.i
+CMakeFiles/mp2.dir/client.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/mp2.dir/client.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/joseph/Documents/CSCE-313/mp2/client.cpp > CMakeFiles/mp2.dir/client.cpp.i
 
-CMakeFiles/mp2.dir/simpleclient.C.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mp2.dir/simpleclient.C.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/joseph/Documents/CSCE-313/mp2/simpleclient.C -o CMakeFiles/mp2.dir/simpleclient.C.s
+CMakeFiles/mp2.dir/client.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/mp2.dir/client.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/joseph/Documents/CSCE-313/mp2/client.cpp -o CMakeFiles/mp2.dir/client.cpp.s
 
-CMakeFiles/mp2.dir/simpleclient.C.o.requires:
+CMakeFiles/mp2.dir/client.cpp.o.requires:
 
-.PHONY : CMakeFiles/mp2.dir/simpleclient.C.o.requires
+.PHONY : CMakeFiles/mp2.dir/client.cpp.o.requires
 
-CMakeFiles/mp2.dir/simpleclient.C.o.provides: CMakeFiles/mp2.dir/simpleclient.C.o.requires
-	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/simpleclient.C.o.provides.build
-.PHONY : CMakeFiles/mp2.dir/simpleclient.C.o.provides
+CMakeFiles/mp2.dir/client.cpp.o.provides: CMakeFiles/mp2.dir/client.cpp.o.requires
+	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/client.cpp.o.provides.build
+.PHONY : CMakeFiles/mp2.dir/client.cpp.o.provides
 
-CMakeFiles/mp2.dir/simpleclient.C.o.provides.build: CMakeFiles/mp2.dir/simpleclient.C.o
+CMakeFiles/mp2.dir/client.cpp.o.provides.build: CMakeFiles/mp2.dir/client.cpp.o
 
 
 # Object files for target mp2
 mp2_OBJECTS = \
-"CMakeFiles/mp2.dir/dataserver.C.o" \
 "CMakeFiles/mp2.dir/mutex.C.o" \
 "CMakeFiles/mp2.dir/reqchannel.C.o" \
-"CMakeFiles/mp2.dir/simpleclient.C.o"
+"CMakeFiles/mp2.dir/client.cpp.o"
 
 # External object files for target mp2
 mp2_EXTERNAL_OBJECTS =
 
-mp2: CMakeFiles/mp2.dir/dataserver.C.o
 mp2: CMakeFiles/mp2.dir/mutex.C.o
 mp2: CMakeFiles/mp2.dir/reqchannel.C.o
-mp2: CMakeFiles/mp2.dir/simpleclient.C.o
+mp2: CMakeFiles/mp2.dir/client.cpp.o
 mp2: CMakeFiles/mp2.dir/build.make
 mp2: CMakeFiles/mp2.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable mp2"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/joseph/Documents/CSCE-313/mp2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable mp2"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/mp2.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -177,10 +151,9 @@ CMakeFiles/mp2.dir/build: mp2
 
 .PHONY : CMakeFiles/mp2.dir/build
 
-CMakeFiles/mp2.dir/requires: CMakeFiles/mp2.dir/dataserver.C.o.requires
 CMakeFiles/mp2.dir/requires: CMakeFiles/mp2.dir/mutex.C.o.requires
 CMakeFiles/mp2.dir/requires: CMakeFiles/mp2.dir/reqchannel.C.o.requires
-CMakeFiles/mp2.dir/requires: CMakeFiles/mp2.dir/simpleclient.C.o.requires
+CMakeFiles/mp2.dir/requires: CMakeFiles/mp2.dir/client.cpp.o.requires
 
 .PHONY : CMakeFiles/mp2.dir/requires
 

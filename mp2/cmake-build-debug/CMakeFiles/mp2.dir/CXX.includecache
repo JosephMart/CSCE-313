@@ -6,31 +6,35 @@
 
 #IncludeRegexTransform: 
 
-/home/joseph/Documents/CSCE-313/mp2/dataserver.C
+/home/joseph/Documents/CSCE-313/mp2/client.cpp
 cassert
 -
-cstring
+string
+-
+iostream
 -
 sstream
 -
-iostream
+stdarg.h
 -
 sys/types.h
 -
 sys/stat.h
 -
-pthread.h
--
 errno.h
 -
 unistd.h
--
-stdlib.h
 -
 reqchannel.H
 /home/joseph/Documents/CSCE-313/mp2/reqchannel.H
 
 /home/joseph/Documents/CSCE-313/mp2/mutex.C
+mutex.H
+/home/joseph/Documents/CSCE-313/mp2/mutex.H
+
+/home/joseph/Documents/CSCE-313/mp2/mutex.H
+pthread.h
+-
 
 /home/joseph/Documents/CSCE-313/mp2/reqchannel.C
 cassert
@@ -63,24 +67,4 @@ fstream
 -
 string
 -
-
-/home/joseph/Documents/CSCE-313/mp2/simpleclient.C
-cassert
--
-string
--
-iostream
--
-sstream
--
-sys/types.h
--
-sys/stat.h
--
-errno.h
--
-unistd.h
--
-reqchannel.H
-/home/joseph/Documents/CSCE-313/mp2/reqchannel.H
 

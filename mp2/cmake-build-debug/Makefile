@@ -123,32 +123,32 @@ mp2/fast:
 	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/build
 .PHONY : mp2/fast
 
-dataserver.o: dataserver.C.o
+client.o: client.cpp.o
 
-.PHONY : dataserver.o
+.PHONY : client.o
 
 # target to build an object file
-dataserver.C.o:
-	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/dataserver.C.o
-.PHONY : dataserver.C.o
+client.cpp.o:
+	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/client.cpp.o
+.PHONY : client.cpp.o
 
-dataserver.i: dataserver.C.i
+client.i: client.cpp.i
 
-.PHONY : dataserver.i
+.PHONY : client.i
 
 # target to preprocess a source file
-dataserver.C.i:
-	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/dataserver.C.i
-.PHONY : dataserver.C.i
+client.cpp.i:
+	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/client.cpp.i
+.PHONY : client.cpp.i
 
-dataserver.s: dataserver.C.s
+client.s: client.cpp.s
 
-.PHONY : dataserver.s
+.PHONY : client.s
 
 # target to generate assembly for a file
-dataserver.C.s:
-	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/dataserver.C.s
-.PHONY : dataserver.C.s
+client.cpp.s:
+	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/client.cpp.s
+.PHONY : client.cpp.s
 
 mutex.o: mutex.C.o
 
@@ -204,33 +204,6 @@ reqchannel.C.s:
 	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/reqchannel.C.s
 .PHONY : reqchannel.C.s
 
-simpleclient.o: simpleclient.C.o
-
-.PHONY : simpleclient.o
-
-# target to build an object file
-simpleclient.C.o:
-	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/simpleclient.C.o
-.PHONY : simpleclient.C.o
-
-simpleclient.i: simpleclient.C.i
-
-.PHONY : simpleclient.i
-
-# target to preprocess a source file
-simpleclient.C.i:
-	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/simpleclient.C.i
-.PHONY : simpleclient.C.i
-
-simpleclient.s: simpleclient.C.s
-
-.PHONY : simpleclient.s
-
-# target to generate assembly for a file
-simpleclient.C.s:
-	$(MAKE) -f CMakeFiles/mp2.dir/build.make CMakeFiles/mp2.dir/simpleclient.C.s
-.PHONY : simpleclient.C.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -240,18 +213,15 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... mp2"
-	@echo "... dataserver.o"
-	@echo "... dataserver.i"
-	@echo "... dataserver.s"
+	@echo "... client.o"
+	@echo "... client.i"
+	@echo "... client.s"
 	@echo "... mutex.o"
 	@echo "... mutex.i"
 	@echo "... mutex.s"
 	@echo "... reqchannel.o"
 	@echo "... reqchannel.i"
 	@echo "... reqchannel.s"
-	@echo "... simpleclient.o"
-	@echo "... simpleclient.i"
-	@echo "... simpleclient.s"
 .PHONY : help
 
 
