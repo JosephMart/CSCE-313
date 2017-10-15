@@ -1,4 +1,4 @@
-/* 
+/*
     File: mutex.H
 
     Author: R. Bettati
@@ -24,13 +24,13 @@
 #include <pthread.h>
 
 /*--------------------------------------------------------------------------*/
-/* DATA STRUCTURES */ 
+/* DATA STRUCTURES */
 /*--------------------------------------------------------------------------*/
 
 /* -- (none) -- */
 
 /*--------------------------------------------------------------------------*/
-/* FORWARDS */ 
+/* FORWARDS */
 /*--------------------------------------------------------------------------*/
 
 /* -- (none) -- */
@@ -41,26 +41,24 @@
 
 class Mutex {
 private:
-  /* -- INTERNAL DATA STRUCTURES
-     You may need to change them to fit your implementation. */
-
-  pthread_mutex_t m;
+    /* -- INTERNAL DATA STRUCTURES
+       You may need to change them to fit your implementation. */
+    bool locked = false;
+    pthread_mutex_t m;
 
 public:
 
-  /* -- CONSTRUCTOR/DESTRUCTOR */
+    /* -- CONSTRUCTOR/DESTRUCTOR */
+    Mutex();
 
-  Mutex();
+    Mutex(bool l);
 
-  ~Mutex();
+    ~Mutex();
 
-  /* -- MUTEX OPERATIONS */
+    /* -- MUTEX OPERATIONS */
+    void Lock();
 
-  void Lock();
-  void Unlock();
+    void Unlock();
 };
 
-
 #endif
-
-

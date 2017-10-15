@@ -13,7 +13,7 @@
 /* DEFINES */
 /*--------------------------------------------------------------------------*/
 
-    /* -- (none) -- */
+/* -- (none) -- */
 
 /*--------------------------------------------------------------------------*/
 /* INCLUDES */
@@ -34,64 +34,64 @@
 using namespace std;
 
 /*--------------------------------------------------------------------------*/
-/* DATA STRUCTURES */ 
+/* DATA STRUCTURES */
 /*--------------------------------------------------------------------------*/
 
-    /* -- (none) -- */
+/* -- (none) -- */
 
 /*--------------------------------------------------------------------------*/
 /* CONSTANTS */
 /*--------------------------------------------------------------------------*/
 
-    /* -- (none) -- */
+/* -- (none) -- */
 
 /*--------------------------------------------------------------------------*/
 /* FORWARDS */
 /*--------------------------------------------------------------------------*/
 
-    /* -- (none) -- */
+/* -- (none) -- */
 
 /*--------------------------------------------------------------------------*/
 /* LOCAL FUNCTIONS -- SUPPORT FUNCTIONS */
 /*--------------------------------------------------------------------------*/
 
 string int2string(int number) {
-   stringstream ss;//create a stringstream
-   ss << number;//add number to the stream
-   return ss.str();//return a string with the contents of the stream
+    stringstream ss;//create a stringstream
+    ss << number;//add number to the stream
+    return ss.str();//return a string with the contents of the stream
 }
 
 /*--------------------------------------------------------------------------*/
 /* MAIN FUNCTION */
 /*--------------------------------------------------------------------------*/
 
-int main(int argc, char * argv[]) {
+int main(int argc, char *argv[]) {
 
-  cout << "CLIENT STARTED:" << endl;
+    cout << "CLIENT STARTED:" << endl;
 
-  cout << "Establishing control channel... " << flush;
-  RequestChannel chan("control", RequestChannel::CLIENT_SIDE);
-  cout << "done." << endl;
+    cout << "Establishing control channel... " << flush;
+    RequestChannel chan("control", RequestChannel::CLIENT_SIDE);
+    cout << "done." << endl;
 
-  /* -- Start sending a sequence of requests */
+    /* -- Start sending a sequence of requests */
 
-  string reply1 = chan.send_request("hello");
-  cout << "Reply to request 'hello' is '" << reply1 << "'" << endl;
+    string reply1 = chan.send_request("hello");
+    cout << "Reply to request 'hello' is '" << reply1 << "'" << endl;
 
-  string reply2 = chan.send_request("data Joe Smith");
-  cout << "Reply to request 'data Joe Smith' is '" << reply2 << "'" << endl;
+    string reply2 = chan.send_request("data Joe Smith");
+    cout << "Reply to request 'data Joe Smith' is '" << reply2 << "'" << endl;
 
-  string reply3 = chan.send_request("data Jane Smith");
-  cout << "Reply to request 'data Jane Smith' is '" << reply3 << "'" << endl;
+    string reply3 = chan.send_request("data Jane Smith");
+    cout << "Reply to request 'data Jane Smith' is '" << reply3 << "'" << endl;
 
-  for(int i = 0; i < 100; i++) {
-    string request_string("data TestPerson" + int2string(i));
-    string reply_string = chan.send_request(request_string);
-	cout << "reply to request " << i << ":" << reply_string << endl;;
-  }
- 
-  string reply4 = chan.send_request("quit");
-  cout << "Reply to request 'quit' is '" << reply4 << endl;
+    for (int i = 0; i < 100; i++) {
+        string request_string("data TestPerson" + int2string(i));
+        string reply_string = chan.send_request(request_string);
+        cout << "reply to request " << i << ":" << reply_string << endl;;
+    }
 
-  usleep(1000000);
+    string reply4 = chan.send_request("quit");
+    cout << "Reply to request 'quit' is '" << reply4 << endl;
+
+    usleep(1000000);
 }

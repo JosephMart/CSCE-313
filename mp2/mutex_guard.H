@@ -24,13 +24,13 @@
 #include "mutex.H"
 
 /*--------------------------------------------------------------------------*/
-/* DATA STRUCTURES */ 
+/* DATA STRUCTURES */
 /*--------------------------------------------------------------------------*/
 
 /* -- (none) -- */
 
 /*--------------------------------------------------------------------------*/
-/* FORWARDS */ 
+/* FORWARDS */
 /*--------------------------------------------------------------------------*/
 
 /* -- (none) -- */
@@ -41,18 +41,23 @@
 
 class MutexGuard {
 private:
-  /* -- INTERNAL DATA STRUCTURES
-     You may need to change them to fit your implementation. */
+    /* -- INTERNAL DATA STRUCTURES
+       You may need to change them to fit your implementation. */
 
-  Mutex * m;
+    Mutex *m;
 
 public:
 
-  /* -- CONSTRUCTOR/DESTRUCTOR */
+    /* -- CONSTRUCTOR/DESTRUCTOR */
 
-  MutexGuard(Mutex & m);
+    MutexGuard(Mutex &m) {
+        this->m = &m;
+        m.Lock();
+    };
 
-  ~MutexGuard();
+    ~MutexGuard() {
+        m->Unlock();
+    };
 
 };
 

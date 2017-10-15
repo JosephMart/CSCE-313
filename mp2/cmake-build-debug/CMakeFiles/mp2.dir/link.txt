@@ -1,0 +1,1 @@
+/usr/bin/c++  -pthread -g  -Wl,-z,relro -Wl,-z,now CMakeFiles/mp2.dir/dataserver.C.o CMakeFiles/mp2.dir/mutex.C.o CMakeFiles/mp2.dir/reqchannel.C.o CMakeFiles/mp2.dir/simpleclient.C.o  -o mp2 
