@@ -22,6 +22,8 @@
 /*--------------------------------------------------------------------------*/
 
 #include <pthread.h>
+#include "mutex.H"
+#include "mutex_guard.H"
 
 /*--------------------------------------------------------------------------*/
 /* DATA STRUCTURES */
@@ -45,9 +47,10 @@ private:
        You may need to change them to fit your implementation. */
 
     int value;
-    pthread_mutex_t m;
-    pthread_cond_t c;
-
+    Mutex mutex = Mutex(false);
+    Mutex delay = Mutex(true);
+    MutexGuard mutex_g = MutexGuard(mutex);
+    MutexGuard delay_g = MutexGuard(delay);
 public:
 
     /* -- CONSTRUCTOR/DESTRUCTOR */
@@ -58,9 +61,9 @@ public:
 
     /* -- SEMAPHORE OPERATIONS */
 
-    int P();
+    void P();
 
-    int V();
+    void V();
 };
 
 
