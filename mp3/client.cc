@@ -299,10 +299,7 @@ BoundedBuffer<string> *lookup(string req, BoundedBuffer<string> **SBB_container)
 void print_histogram(string name, int data[]) {
     cout << '\n' << "Histogram for " << name << '\n' << '\n';
     for (int i = 0; i < 100; i += 10) {
-        cout << setw(7) << "[" << i << ", " << i + 9 << "]: ";
-        for (int j = 0; j < data[i / 10]; ++j) {
-            cout << '*';
-        }
-        cout << '\n';
+        cout << setw(7) << "[" << setw(2) << setfill('0') << i << ", " << setw(2) << setfill('0') << i + 9 << "]: "
+             << setw(data[i/10]) << setfill('*') << '\n' << setfill(' ');
     }
 }
