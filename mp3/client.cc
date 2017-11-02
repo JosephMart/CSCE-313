@@ -6,6 +6,7 @@
 #include <vector>
 #include <bits/unique_ptr.h>
 #include <cmath>
+#include <sys/time.h>
 #include "reqchannel.H"
 #include "BoundedBuffer.h"
 
@@ -101,16 +102,16 @@ int main(int argc, char **argv) {
 
 
     // Start the dataserver
-    // pid_t id = fork();
-    // if (id < 0) {
-    //         cerr << "Failed to fork." << '\n';
-    //         exit(1);
-    // }
-    //
-    // if (id == 0) {
-    //         execv("./dataserver", 0);
-    //         _exit(1);
-    // }
+    pid_t id = fork();
+    if (id < 0) {
+        cerr << "Failed to fork." << '\n';
+        exit(1);
+    }
+
+    if (id == 0) {
+        execv("./dataserver", 0);
+        _exit(1);
+    }
 
     // DEBUG parsed params
     printf("Requests per Person: %i\n"
@@ -123,6 +124,12 @@ int main(int argc, char **argv) {
     cout << "Establishing control channel... " << flush;
     RequestChannel chan("control", RequestChannel::CLIENT_SIDE);
     cout << "done." << endl;
+    // ------------------------------------------------
+
+    // Setup timers
+    // ------------------------------------------------
+    timeval begin, end;
+    gettimeofday(&begin, NULL);
     // ------------------------------------------------
 
     // Create worker bounded buffer
@@ -206,9 +213,12 @@ int main(int argc, char **argv) {
     }
 
     // Wait for stat threads to exit
-    for (int i=0; i < NUM_PEOPLE; ++i) {
+    for (int i = 0; i < NUM_PEOPLE; ++i) {
         pthread_join(stat_threads[i], NULL);
     }
+
+    // Time end of Requests
+    gettimeofday(&end, NULL);
 
     // CLose Control
     string reply4 = chan.send_request("quit");
@@ -220,6 +230,8 @@ int main(int argc, char **argv) {
     for (int i = JOHN; i <= JOE; ++i) {
         print_histogram(names[i], HISTOGRAM[i]);
     }
+    cout << endl << "Total request time: " << end.tv_sec - begin.tv_sec << " sec " << end.tv_usec - begin.tv_usec
+         << " musec" << endl;
 }
 
 
@@ -275,8 +287,8 @@ BoundedBuffer<string> *lookup(string req, BoundedBuffer<string> **SBB_container)
 }
 
 void print_histogram(string name, int data[]) {
-    cout << endl << endl <<  "Histogram for " << name << endl << endl;
+    cout << endl << endl << "Histogram for " << name << endl << endl;
     for (int i = 0; i < 100; i += 10) {
-        cout << "[" << i << ", " << i + 9 << "]: " << data[i/10] << endl;
+        cout << "[" << i << ", " << i + 9 << "]: " << data[i / 10] << endl;
     }
 }
