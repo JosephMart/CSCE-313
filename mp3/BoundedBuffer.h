@@ -3,9 +3,12 @@
 
 #include "semaphore.H"
 #include "mutex.H"
-//#include "mutex_guard.H"
 #include <queue>
+#include <pthread.h>
 
+using namespace std;
+
+template <class T>
 class BoundedBuffer {
 private:
     /* -- INTERNAL DATA STRUCTURES
@@ -14,7 +17,7 @@ private:
     Semaphore *full;
     Semaphore *empty;
     Mutex mutex;
-    std::queue<int> q;
+    std::queue<T> q;
     int size;
 
 public:
@@ -28,6 +31,41 @@ public:
 
     int Remove();
 };
+
+template <class T>
+BoundedBuffer<T>::BoundedBuffer(int _size) {
+    size = _size;
+    lock = new Semaphore(1);
+    full = new Semaphore(0);
+    empty = new Semaphore(size);
+}
+
+template <class T>
+BoundedBuffer<T>::~BoundedBuffer() {
+    delete lock;
+    delete full;
+    delete empty;
+}
+
+template <class T>
+void BoundedBuffer<T>::Deposit(int _value) {
+    empty->P();  //P() decreases
+    lock->P();   // Crit Section
+    q.push(_value);
+    lock->V();   // V() increases
+    full->V();
+}
+
+template <class T>
+int BoundedBuffer<T>::Remove() {
+    full->P();
+    lock->P();                   //Crit Section
+    int r = q.front();
+    q.pop();
+    lock->V();
+    empty->V();
+    return r;
+}
 
 
 #endif //MP3_BOUNDEDBUFFER_H

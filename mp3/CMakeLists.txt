@@ -8,7 +8,7 @@ set(SOURCE_FILES
         reqchannel.cc
         reqchannel.H
         semaphore.H
-        simpleclient.cc semaphore.cc client.cc BoundedBuffer.cc BoundedBuffer.h
+        simpleclient.cc semaphore.cc client.cc BoundedBuffer.h
         mutex.cc mutex.H mutex_guard.H BoundedBufferUnitTests.cc mutex_guard.cc)
 
 add_executable(mp3 ${SOURCE_FILES})

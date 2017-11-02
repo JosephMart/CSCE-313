@@ -5,7 +5,7 @@
 
 using namespace std;
 
-BoundedBuffer buffer(100);
+BoundedBuffer<int> buffer(100);
 
 void *produce_items(void *) {
     for (int i = 0; i < 100000; i++) { /* Deposit 100000 items */
