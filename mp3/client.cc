@@ -3,11 +3,56 @@
 #include <cstdio>
 #include <iostream>
 #include <zconf.h>
+#include <vector>
+#include <bits/unique_ptr.h>
+#include <pthread.h>
 #include "reqchannel.H"
 
-#define MAX_WORKER_THREADS 126
 
 using namespace std;
+
+/*--------------------------------------------------------------------------*/
+/* DATA STRUCTURES */
+/*--------------------------------------------------------------------------*/
+
+typedef struct gen_req_params {
+    string patient_name;
+    int n;
+//    BoundedBuffer buff;
+} REQ_PARAMS;
+
+//typedef struct stats_params {
+//    string patient_name;
+//    BoundedBuffer buff;
+//} STATS_PARAMS;
+//
+typedef struct work_thread_params {
+//    BoundedBuffer buff;
+    // SBB_container;
+    RequestChannel chan;
+} WORK_THREAD_PARAMS;
+
+/*--------------------------------------------------------------------------*/
+/* CONSTANTS */
+/*--------------------------------------------------------------------------*/
+
+#define NUM_PEOPLE 3
+#define MAX_WORKER_THREADS 126
+
+enum people {
+    JOHN, JANE, JOE
+};
+string names[] = {"John Doe", "Jane Smith", "Joe Smith"};
+
+/*--------------------------------------------------------------------------*/
+/* FORWARDS */
+/*--------------------------------------------------------------------------*/
+void request_thread_func(void *req_args);
+
+void build_hist(void *func_params);
+
+void* worker_thread_func(void *func_params);
+
 
 int main(int argc, char **argv) {
     int c = 0;
@@ -36,43 +81,126 @@ int main(int argc, char **argv) {
         }
     }
 
+    // Initialize the threads
+    // One thread for each person
+    pthread_t request_threads[NUM_PEOPLE];
+    pthread_t stat_threads[NUM_PEOPLE];
+
+    // Create threads passed on passed param
+    pthread_t worker_threads[num_worker_threads];
+
+
+    // Start the dataserver
+    // pid_t id = fork();
+    // if (id < 0) {
+    //         cerr << "Failed to fork." << '\n';
+    //         exit(1);
+    // }
+    //
+    // if (id == 0) {
+    //         execv("./dataserver", 0);
+    //         _exit(1);
+    // }
+
     // DEBUG parsed params
     printf("Requests per Person: %i\n"
                    "Buffer Size: %i\n"
                    "Number of Worker Threads: %i\n", req_per_person, buffer_size, num_worker_threads);
 
-
-
+    // Start Connection to data server
+    // ------------------------------------------------
     cout << "CLIENT STARTED:" << endl;
-
     cout << "Establishing control channel... " << flush;
     RequestChannel chan("control", RequestChannel::CLIENT_SIDE);
-    cout << "done." << endl;;
+    cout << "done." << endl;
+    // ------------------------------------------------
 
-    /* -- Start sending a sequence of requests */
+    // Create worker bounded buffer
+    // ------------------------------------------------
+    // ------------------------------------------------
 
-    string reply1 = chan.send_request("hello");
-    cout << "Reply to request 'hello' is '" << reply1 << "'" << endl;
+    // Start w worker threads
+    // ------------------------------------------------
+    // Create num_worker_threads Request Channels
+    unique_ptr<RequestChannel> req_channels[num_worker_threads];
+    string reply;
+    WORK_THREAD_PARAMS* w_t_params;
 
-    string reply2 = chan.send_request("data Joe Smith");
-    cout << "Reply to request 'data Joe Smith' is '" << reply2 << "'" << endl;
+    for (int i = 0; i < num_worker_threads; ++i) {
+        reply = chan.send_request("newthread");
+        cout << "Reply to request for new thread is '" << reply << "'" << endl;
 
-    string reply3 = chan.send_request("data Jane Smith");
-    cout << "Reply to request 'data Jane Smith' is '" << reply3 << "'" << endl;
+        req_channels[i] = unique_ptr<RequestChannel>(
+                new RequestChannel(reply, RequestChannel::CLIENT_SIDE)
+        );
 
-    string reply5 = chan.send_request("newthread");
-    cout << "Reply to request 'newthread' is " << reply5 << "'" << endl;
-    RequestChannel chan2(reply5, RequestChannel::CLIENT_SIDE);
+        w_t_params = new WORK_THREAD_PARAMS{
+                //    BoundedBuffer buff;
+                // SBB_container;
+                *req_channels[i] // RequestChannel;
+        };
 
-    string reply6 = chan2.send_request("data John Doe");
-    cout << "Reply to request 'data John Doe' is '" << reply6 << "'" << endl;
+        pthread_create(&worker_threads[i], NULL, worker_thread_func, (void*) w_t_params);
+    }
+    // ------------------------------------------------
 
-    string reply7 = chan2.send_request("quit");
-    cout << "Reply to request 'quit' is '" << reply7 << "'" << endl;
 
+    // Start request threads (1 for each patient)
+    // ------------------------------------------------
+    unique_ptr<REQ_PARAMS> req_params[NUM_PEOPLE];
+
+    // Create Req Params
+    for (int i = JOHN; i <= JOE; ++i) {
+        req_params[i] = unique_ptr<REQ_PARAMS> (new REQ_PARAMS{
+                names[i],           // Patient name
+                num_worker_threads// Num of Worker Threads
+        });
+    }
+    // ------------------------------------------------
+
+//    pthread_create(req_thread[1], generate_requests, (void *) req_args[1])
+
+    // Start statistic threads (1 for each patient)
+    // Create Statistic bounded buffer
+
+    // Close Req Channels
+    for (int j = 0; j < NUM_PEOPLE; ++j) {
+        string reply = req_channels[j]->send_request("quit");
+        cout << "Reply to request 'quit' is '" << reply << "'" << endl;
+    }
+
+    // CLose Control
     string reply4 = chan.send_request("quit");
     cout << "Reply to request 'quit' is '" << reply4 << "'" << endl;
 
     usleep(1000000);
 
+}
+
+
+void request_thread_func(void *req_args) {
+    REQ_PARAMS *params = (REQ_PARAMS *) req_args;
+    for (int i = 0; i < params->n; i++) {
+        string req = "data" + params->patient_name;
+//        params->buff->deposit(req);
+    }
+}
+
+// statistics thread
+//void build_hist(void *func_params) {
+//    STATS_PARAMS *params = (STATS_PARAMS *) func_params;
+//    for (int i = 0; i < params->n; i++) {
+//        string req = "data" + params->patient_name;
+//        params->buff->deposit(req);
+//    }
+//}
+
+void* worker_thread_func(void *func_params) {
+    WORK_THREAD_PARAMS *params = (WORK_THREAD_PARAMS *) func_params;
+//    while (1) {
+//        string req = params->buff->withdraw();
+//        string reply = params->chan->send_request(req);
+//        SBB *sbb = lookup(req, SSB_container);
+//        ssb->deposit(reply);
+//    }
 }

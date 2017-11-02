@@ -4,10 +4,10 @@ project(mp3)
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
-        dataserver.C
-        reqchannel.C
+        dataserver.cc
+        reqchannel.cc
         reqchannel.H
         semaphore.H
-        simpleclient.C semaphore.cpp client.cpp)
+        simpleclient.cc semaphore.cc client.cc BoundedBuffer.cc BoundedBuffer.h)
 
 add_executable(mp3 ${SOURCE_FILES})

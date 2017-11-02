@@ -16,4 +16,4 @@ simpleclient: simpleclient.cc reqchannel.o
 	g++ $(CXXFLAGS) -g -o simpleclient simpleclient.cc reqchannel.o
 
 client: client.cc reqchannel.o
-	g++ $(CXXFLAGS) -g -o client client.cc reqchannel.o
+	g++ $(CXXFLAGS) -g -o client client.cc reqchannel.o -lpthread
