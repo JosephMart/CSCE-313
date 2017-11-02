@@ -6,9 +6,6 @@ all: dataserver client
 mutex.o: mutex.H mutex.cc
 	$(CC) $(CXXFLAGS) -c -g mutex.cc -lpthread
 
-mutex_guard.o: mutex_guard.H mutex_guard.cc
-	$(CC) $(CXXFLAGS) -c -g mutex_guard.cc
-
 semaphore.o: semaphore.cc semaphore.H
 	$(CC) $(CXXFLAGS) -c -g semaphore.cc -lpthread
 
