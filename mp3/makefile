@@ -15,9 +15,6 @@ reqchannel.o: reqchannel.H reqchannel.cc
 dataserver: dataserver.cc reqchannel.o
 	$(CC) $(CXXFLAGS) -g -o dataserver dataserver.cc reqchannel.o -lpthread
 
-# simpleclient: simpleclient.cc reqchannel.o
-#	 g++ -g -o simpleclient simpleclient.cc reqchannel.o
-
 client: client.cc reqchannel.o BoundedBuffer.h mutex.o semaphore.o
 	$(CC) $(CXXFLAGS) -g -o client client.cc reqchannel.o BoundedBuffer.h mutex.o semaphore.o -lpthread
 

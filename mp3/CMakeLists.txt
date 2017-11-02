@@ -7,8 +7,7 @@ set(SOURCE_FILES
         dataserver.cc
         reqchannel.cc
         reqchannel.H
-        semaphore.H
-        simpleclient.cc semaphore.cc client.cc BoundedBuffer.h
-        mutex.cc mutex.H mutex_guard.H BoundedBufferUnitTests.cc mutex_guard.cc)
+        semaphore.H semaphore.cc client.cc BoundedBuffer.h
+        mutex.cc mutex.H BoundedBufferUnitTests.cc)
 
 add_executable(mp3 ${SOURCE_FILES})
