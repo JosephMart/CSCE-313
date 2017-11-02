@@ -54,3 +54,7 @@ dkms.conf
 # clion
 cmake-build-debug/
 .idea/
+
+#mp3 files
+client
+dataserver
