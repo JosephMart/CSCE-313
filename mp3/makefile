@@ -21,8 +21,8 @@ dataserver: dataserver.cc reqchannel.o
 # simpleclient: simpleclient.cc reqchannel.o
 #	 g++ -g -o simpleclient simpleclient.cc reqchannel.o
 
-client: client.cc reqchannel.o BoundedBuffer.o
-	$(CC) $(CXXFLAGS) -g -o client client.cc reqchannel.o BoundedBuffer.o -lpthread
+client: client.cc reqchannel.o BoundedBuffer.h mutex.o semaphore.o
+	$(CC) $(CXXFLAGS) -g -o client client.cc reqchannel.o BoundedBuffer.h mutex.o semaphore.o -lpthread
 
 BoundedBufferUnitTests: BoundedBufferUnitTests.cc BoundedBuffer.h mutex.o semaphore.o
 	$(CC) $(CXXFLAGS) -g -o BoundedBufferUnitTests BoundedBufferUnitTests.cc BoundedBuffer.h mutex.o semaphore.o -lpthread

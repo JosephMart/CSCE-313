@@ -6,6 +6,7 @@
 #include <vector>
 #include <bits/unique_ptr.h>
 #include "reqchannel.H"
+#include "BoundedBuffer.h"
 
 
 using namespace std;
@@ -17,18 +18,18 @@ using namespace std;
 typedef struct gen_req_params {
     string patient_name;
     int n;
-//    BoundedBuffer buff;
+    BoundedBuffer<string> *buff;
 } REQ_PARAMS;
 
-//typedef struct stats_params {
-//    string patient_name;
-//    BoundedBuffer buff;
-//} STATS_PARAMS;
-//
+typedef struct stats_params {
+    string patient_name;
+    BoundedBuffer<string> buff;
+} STATS_PARAMS;
+
 typedef struct work_thread_params {
-//    BoundedBuffer buff;
-    // SBB_container;
-    RequestChannel chan;
+    BoundedBuffer<string> *buff;
+//    BoundedBuffer<int> SBB_container;
+    RequestChannel *chan;
 } WORK_THREAD_PARAMS;
 
 /*--------------------------------------------------------------------------*/
@@ -46,14 +47,15 @@ string names[] = {"John Doe", "Jane Smith", "Joe Smith"};
 /*--------------------------------------------------------------------------*/
 /* FORWARDS */
 /*--------------------------------------------------------------------------*/
-void* request_thread_func(void *req_args);
+void *request_thread_func(void *req_args);
 
-void build_hist(void *func_params);
+void *build_hist(void *func_params);
 
-void* worker_thread_func(void *func_params);
+void *worker_thread_func(void *func_params);
 
 
 int main(int argc, char **argv) {
+    setbuf(stdout, NULL);
     int c = 0;
     extern char *optarg;
 
@@ -80,8 +82,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    // Initialize the threads
-    // One thread for each person
+    // Initialize the threads - One thread for each person
     pthread_t request_threads[NUM_PEOPLE];
     pthread_t stat_threads[NUM_PEOPLE];
 
@@ -116,94 +117,126 @@ int main(int argc, char **argv) {
 
     // Create worker bounded buffer
     // ------------------------------------------------
+    BoundedBuffer<string> *work_buffer = new BoundedBuffer<string>(buffer_size);
+    // ------------------------------------------------
+    // Create stats bounded buffer
+    // ------------------------------------------------
+    BoundedBuffer<string> stat_buffer = BoundedBuffer<string>(buffer_size);
     // ------------------------------------------------
 
     // Start w worker threads
     // ------------------------------------------------
     // Create num_worker_threads Request Channels
-    unique_ptr<RequestChannel> req_channels[num_worker_threads];
+    RequestChannel *req_channel;
     string reply;
-    WORK_THREAD_PARAMS* w_t_params;
+    WORK_THREAD_PARAMS *w_t_params;
 
     for (int i = 0; i < num_worker_threads; ++i) {
         reply = chan.send_request("newthread");
         cout << "Reply to request for new thread is '" << reply << "'" << endl;
 
-        req_channels[i] = unique_ptr<RequestChannel>(
-                new RequestChannel(reply, RequestChannel::CLIENT_SIDE)
-        );
+        req_channel = new RequestChannel(reply, RequestChannel::CLIENT_SIDE);
 
         w_t_params = new WORK_THREAD_PARAMS{
-                //    BoundedBuffer buff;
+                work_buffer,//    BoundedBuffer buff;
                 // SBB_container;
-                *req_channels[i] // RequestChannel;
+                req_channel // RequestChannel;
         };
 
-        pthread_create(&worker_threads[i], NULL, worker_thread_func, (void*) w_t_params);
+        pthread_create(&worker_threads[i], NULL, worker_thread_func, (void *) w_t_params);
     }
     // ------------------------------------------------
 
 
     // Start request threads (1 for each patient)
     // ------------------------------------------------
-    unique_ptr<REQ_PARAMS> req_params[NUM_PEOPLE];
+    REQ_PARAMS *req_params;
 
     // Create Req Params
     for (int i = JOHN; i <= JOE; ++i) {
         cout << "Generating Request thread for " << names[i] << endl;
-        req_params[i] = unique_ptr<REQ_PARAMS> (new REQ_PARAMS{
+        req_params = new REQ_PARAMS{
                 names[i],           // Patient name
-                num_worker_threads// Num of Worker Threads
-        });
-        pthread_create(&request_threads[i], NULL, request_thread_func, (void*) req_params);
+                req_per_person,// Num of Worker Threads
+                work_buffer
+        };
+        pthread_create(&request_threads[i], NULL, request_thread_func, (void *) req_params);
     }
     // ------------------------------------------------
 
-//    pthread_create(req_thread[1], generate_requests, (void *) req_args[1])
+    // Create Statistic bounded buffer
+    // ------------------------------------------------
+    BoundedBuffer<string> stats_buffer = BoundedBuffer<string>(buffer_size);
+    // ------------------------------------------------
 
     // Start statistic threads (1 for each patient)
-    // Create Statistic bounded buffer
+    // ------------------------------------------------
+//    STATS_PARAMS *stat_params;
+//
+//    for (int i = JOHN; i <= JOE; ++i) {
+//        cout << "Generating Statistic thread for " << names[i] << endl;
+//        stat_params =  new STATS_PARAMS{
+//                names[i],           // Patient name
+//                stat_buffer
+//        };
+//        pthread_create(&request_threads[i], NULL, request_thread_func, (void *) stat_params);
+//    }
+    // ------------------------------------------------
 
-    // Close Req Channels
+    // Wait for request threads to finish
     for (int j = 0; j < NUM_PEOPLE; ++j) {
-        string reply = req_channels[j]->send_request("quit");
-        cout << "Reply to request 'quit' is '" << reply << "'" << endl;
+        pthread_join(request_threads[j],NULL);
+    }
+
+    // Kill the workers
+    for (int i=0; i< num_worker_threads;++i) {
+        work_buffer->Deposit("quit");
+    }
+
+    //Wait for worker threads to exit
+    for (int i=0; i < num_worker_threads; ++i) {
+        pthread_join(worker_threads[i], NULL);
     }
 
     // CLose Control
     string reply4 = chan.send_request("quit");
-    cout << "Reply to request 'quit' is '" << reply4 << "'" << endl;
+    cout << "Control Reply to request 'quit' is '" << reply4 << "'" << endl;
 
     usleep(1000000);
-
 }
 
 
-void* request_thread_func(void *req_args) {
+void *request_thread_func(void *req_args) {
     REQ_PARAMS *params = (REQ_PARAMS *) req_args;
     for (int i = 0; i < params->n; i++) {
-        string req = "data" + params->patient_name;
-//        params->buff->deposit(req);
+        string req = "data " + params->patient_name;
+        cout << "Depositing Request: " << req << endl;
+        params->buff->Deposit(req);
     }
     return 0;
 }
 
-// statistics thread
-//void build_hist(void *func_params) {
+void *build_hist(void *func_params) {
 //    STATS_PARAMS *params = (STATS_PARAMS *) func_params;
 //    for (int i = 0; i < params->n; i++) {
 //        string req = "data" + params->patient_name;
-//        params->buff->deposit(req);
+//        params->buff.Deposit(req);
 //    }
-//}
+    return 0;
+}
 
-void* worker_thread_func(void *func_params) {
+void *worker_thread_func(void *func_params) {
     WORK_THREAD_PARAMS *params = (WORK_THREAD_PARAMS *) func_params;
-//    while (1) {
-//        string req = params->buff->withdraw();
-//        string reply = params->chan->send_request(req);
+    while (1) {
+        string req = params->buff->Remove();
+        cout << "Sending Request: " << req << endl;
+        string reply = params->chan->send_request(req);
+        cout << "Response to : " << req << " --- " << reply << endl;
+        if (req == "quit") {
+            break;
+        }
 //        SBB *sbb = lookup(req, SSB_container);
 //        ssb->deposit(reply);
-//    }
+    }
     return 0;
 }

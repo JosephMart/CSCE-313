@@ -22,15 +22,21 @@ private:
 
 public:
     /* -- CONSTRUCTOR/DESTRUCTOR */
+    BoundedBuffer();
     BoundedBuffer(int _size);
 
     ~BoundedBuffer();
 
     /* -- BUFFER OPERATIONS */
-    void Deposit(int _value);
+    void Deposit(T _value);
 
-    int Remove();
+    T Remove();
 };
+
+template <class T>
+BoundedBuffer<T>::BoundedBuffer() {
+    size = 0;
+}
 
 template <class T>
 BoundedBuffer<T>::BoundedBuffer(int _size) {
@@ -48,19 +54,19 @@ BoundedBuffer<T>::~BoundedBuffer() {
 }
 
 template <class T>
-void BoundedBuffer<T>::Deposit(int _value) {
-    empty->P();  //P() decreases
-    lock->P();   // Crit Section
+void BoundedBuffer<T>::Deposit(T _value) {
+    empty->P();
+    lock->P();
     q.push(_value);
-    lock->V();   // V() increases
+    lock->V();
     full->V();
 }
 
 template <class T>
-int BoundedBuffer<T>::Remove() {
+T BoundedBuffer<T>::Remove() {
     full->P();
-    lock->P();                   //Crit Section
-    int r = q.front();
+    lock->P();
+    T r = q.front();
     q.pop();
     lock->V();
     empty->V();
