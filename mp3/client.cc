@@ -7,6 +7,7 @@
 #include <bits/unique_ptr.h>
 #include <cmath>
 #include <sys/time.h>
+#include <iomanip>
 #include "reqchannel.H"
 #include "BoundedBuffer.h"
 
@@ -113,17 +114,12 @@ int main(int argc, char **argv) {
         _exit(1);
     }
 
-    // DEBUG parsed params
-    printf("Requests per Person: %i\n"
-                   "Buffer Size: %i\n"
-                   "Number of Worker Threads: %i\n", req_per_person, buffer_size, num_worker_threads);
-
     // Start Connection to data server
     // ------------------------------------------------
-    cout << "CLIENT STARTED:" << endl;
+    cout << "CLIENT STARTED:" << '\n';
     cout << "Establishing control channel... " << flush;
     RequestChannel chan("control", RequestChannel::CLIENT_SIDE);
-    cout << "done." << endl;
+    cout << "done." << '\n';
     // ------------------------------------------------
 
     // Setup timers
@@ -143,7 +139,7 @@ int main(int argc, char **argv) {
 
     // Create Req Params
     for (int i = JOHN; i <= JOE; ++i) {
-        cout << "Generating Request thread for " << names[i] << endl;
+        cout << "Generating Request thread for " << names[i] << '\n';
         req_params = new REQ_PARAMS{
                 names[i],           // Patient name
                 req_per_person,// Num of Worker Threads
@@ -163,7 +159,7 @@ int main(int argc, char **argv) {
     STATS_PARAMS *stat_params;
 
     for (int i = JOHN; i <= JOE; ++i) {
-        cout << "Generating Statistic thread for " << names[i] << endl;
+        cout << "Generating Statistic thread for " << names[i] << '\n';
         stats_buffer[i] = new BoundedBuffer<string>(req_per_person);
         stat_params = new STATS_PARAMS{
                 i,        // Patient name
@@ -183,7 +179,7 @@ int main(int argc, char **argv) {
 
     for (int i = 0; i < num_worker_threads; ++i) {
         reply = chan.send_request("newthread");
-        cout << "Reply to request for new thread is '" << reply << "'" << endl;
+        cout << "Reply to request for new thread is '" << reply << "'" << '\n';
 
         req_channel = new RequestChannel(reply, RequestChannel::CLIENT_SIDE);
 
@@ -222,24 +218,38 @@ int main(int argc, char **argv) {
 
     // CLose Control
     string reply4 = chan.send_request("quit");
-    cout << "Control Reply to request 'quit' is '" << reply4 << "'" << endl;
+    cout << "Control Reply to request 'quit' is '" << reply4 << "'" << '\n';
 
     usleep(1000000);
 
     // Print the Histograms
+    cout << setfill('-') << setw(40) << '\n'
+         << setfill(' ')
+         << setw(20) << "Histograms" << setw(20) << '\n'
+         << setfill('-') << setw(40) << '\n'
+         << setfill(' ');
     for (int i = JOHN; i <= JOE; ++i) {
         print_histogram(names[i], HISTOGRAM[i]);
     }
-    cout << endl << "Total request time: " << end.tv_sec - begin.tv_sec << " sec " << end.tv_usec - begin.tv_usec
-         << " musec" << endl;
-}
 
+    // Print Data
+    cout << '\n' << setfill('-') << setw(40) << '\n'
+         << setfill(' ')
+         << setw(20) << "Statistics" << setw(20) << '\n'
+         << setfill('-') << setw(40) << '\n'
+         << setfill(' ')
+         << "Requests per Person: " << req_per_person << '\n'
+         << "Buffer Size: " << buffer_size << '\n'
+         << "Number of Worker Threads: " << num_worker_threads << '\n'
+         << "Requests Run Time: " << end.tv_sec - begin.tv_sec << " sec " << end.tv_usec - begin.tv_usec
+         << " musec" << '\n';
+}
 
 void *request_thread_func(void *req_args) {
     REQ_PARAMS *params = (REQ_PARAMS *) req_args;
     for (int i = 0; i < params->n; i++) {
         string req = "data " + params->patient_name;
-        cout << "Depositing Request: " << req << endl;
+        cout << "Depositing Request: " << req << '\n';
         params->buff->Deposit(req);
     }
     return 0;
@@ -248,7 +258,7 @@ void *request_thread_func(void *req_args) {
 void *build_hist(void *func_params) {
     STATS_PARAMS *params = (STATS_PARAMS *) func_params;
     string item;
-    cout << "Building Histograms for " << names[params->patient_index] << endl;
+    cout << "Building Histograms for " << names[params->patient_index] << '\n';
     int bin_index;
     int value;
     for (int i = 0; i < params->n; i++) {
@@ -264,9 +274,9 @@ void *worker_thread_func(void *func_params) {
     WORK_THREAD_PARAMS *params = (WORK_THREAD_PARAMS *) func_params;
     while (1) {
         string req = params->buff->Remove();
-        cout << "Sending Request: " << req << endl;
+        cout << "Sending Request: " << req << '\n';
         string reply = params->chan->send_request(req);
-        cout << "Response to : " << req << " --- " << reply << endl;
+        cout << "Response to : " << req << " --- " << reply << '\n';
         if (req == "quit") {
             break;
         }
@@ -280,15 +290,19 @@ BoundedBuffer<string> *lookup(string req, BoundedBuffer<string> **SBB_container)
     for (int i = JOHN; i <= JOE; ++i) {
         size_t found = req.find(names[i]);
         if (found != std::string::npos) {
-            cout << "Depositing " << req << " into stat buffer for " << names[i] << endl;
+            cout << "Depositing " << req << " into stat buffer for " << names[i] << '\n';
             return SBB_container[i];
         }
     }
 }
 
 void print_histogram(string name, int data[]) {
-    cout << endl << endl << "Histogram for " << name << endl << endl;
+    cout << '\n' << "Histogram for " << name << '\n' << '\n';
     for (int i = 0; i < 100; i += 10) {
-        cout << "[" << i << ", " << i + 9 << "]: " << data[i / 10] << endl;
+        cout << setw(7) << "[" << i << ", " << i + 9 << "]: ";
+        for (int j = 0; j < data[i / 10]; ++j) {
+            cout << '*';
+        }
+        cout << '\n';
     }
 }
