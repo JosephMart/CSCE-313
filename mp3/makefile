@@ -1,5 +1,5 @@
 CC = g++
-CXXFLAGS = -Wall -Wextra -pedantic
+CXXFLAGS = -std=c++14
 
 all: dataserver client
 
