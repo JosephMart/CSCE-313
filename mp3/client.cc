@@ -5,11 +5,20 @@
 #include <zconf.h>
 #include <vector>
 #include <bits/unique_ptr.h>
+#include <cmath>
 #include "reqchannel.H"
 #include "BoundedBuffer.h"
 
 
 using namespace std;
+
+/*--------------------------------------------------------------------------*/
+/* CONSTANTS */
+/*--------------------------------------------------------------------------*/
+
+#define NUM_PEOPLE 3
+#define NUM_BINS 10
+#define MAX_WORKER_THREADS 126
 
 /*--------------------------------------------------------------------------*/
 /* DATA STRUCTURES */
@@ -22,27 +31,24 @@ typedef struct gen_req_params {
 } REQ_PARAMS;
 
 typedef struct stats_params {
-    string patient_name;
-    BoundedBuffer<string> buff;
+    int patient_index;
+    int n;
+    BoundedBuffer<string> *buff;
 } STATS_PARAMS;
 
 typedef struct work_thread_params {
     BoundedBuffer<string> *buff;
-//    BoundedBuffer<int> SBB_container;
+    BoundedBuffer<string> **SSB_container;
     RequestChannel *chan;
 } WORK_THREAD_PARAMS;
 
-/*--------------------------------------------------------------------------*/
-/* CONSTANTS */
-/*--------------------------------------------------------------------------*/
-
-#define NUM_PEOPLE 3
-#define MAX_WORKER_THREADS 126
 
 enum people {
     JOHN, JANE, JOE
 };
 string names[] = {"John Doe", "Jane Smith", "Joe Smith"};
+
+int HISTOGRAM[NUM_PEOPLE][NUM_BINS];
 
 /*--------------------------------------------------------------------------*/
 /* FORWARDS */
@@ -53,9 +59,13 @@ void *build_hist(void *func_params);
 
 void *worker_thread_func(void *func_params);
 
+BoundedBuffer<string> *lookup(string req, BoundedBuffer<string> **SBB_container);
+
+void print_histogram(string name, int data[]);
+
 
 int main(int argc, char **argv) {
-    setbuf(stdout, NULL);
+//    setbuf(stdout, NULL);
     int c = 0;
     extern char *optarg;
 
@@ -119,34 +129,6 @@ int main(int argc, char **argv) {
     // ------------------------------------------------
     BoundedBuffer<string> *work_buffer = new BoundedBuffer<string>(buffer_size);
     // ------------------------------------------------
-    // Create stats bounded buffer
-    // ------------------------------------------------
-    BoundedBuffer<string> stat_buffer = BoundedBuffer<string>(buffer_size);
-    // ------------------------------------------------
-
-    // Start w worker threads
-    // ------------------------------------------------
-    // Create num_worker_threads Request Channels
-    RequestChannel *req_channel;
-    string reply;
-    WORK_THREAD_PARAMS *w_t_params;
-
-    for (int i = 0; i < num_worker_threads; ++i) {
-        reply = chan.send_request("newthread");
-        cout << "Reply to request for new thread is '" << reply << "'" << endl;
-
-        req_channel = new RequestChannel(reply, RequestChannel::CLIENT_SIDE);
-
-        w_t_params = new WORK_THREAD_PARAMS{
-                work_buffer,//    BoundedBuffer buff;
-                // SBB_container;
-                req_channel // RequestChannel;
-        };
-
-        pthread_create(&worker_threads[i], NULL, worker_thread_func, (void *) w_t_params);
-    }
-    // ------------------------------------------------
-
 
     // Start request threads (1 for each patient)
     // ------------------------------------------------
@@ -166,36 +148,66 @@ int main(int argc, char **argv) {
 
     // Create Statistic bounded buffer
     // ------------------------------------------------
-    BoundedBuffer<string> stats_buffer = BoundedBuffer<string>(buffer_size);
+    BoundedBuffer<string> *stats_buffer[NUM_PEOPLE];
     // ------------------------------------------------
 
     // Start statistic threads (1 for each patient)
     // ------------------------------------------------
-//    STATS_PARAMS *stat_params;
-//
-//    for (int i = JOHN; i <= JOE; ++i) {
-//        cout << "Generating Statistic thread for " << names[i] << endl;
-//        stat_params =  new STATS_PARAMS{
-//                names[i],           // Patient name
-//                stat_buffer
-//        };
-//        pthread_create(&request_threads[i], NULL, request_thread_func, (void *) stat_params);
-//    }
+    STATS_PARAMS *stat_params;
+
+    for (int i = JOHN; i <= JOE; ++i) {
+        cout << "Generating Statistic thread for " << names[i] << endl;
+        stats_buffer[i] = new BoundedBuffer<string>(req_per_person);
+        stat_params = new STATS_PARAMS{
+                i,        // Patient name
+                req_per_person,  // Number of request
+                stats_buffer[i]  // Stats Buffer
+        };
+
+        pthread_create(&stat_threads[i], NULL, build_hist, (void *) stat_params);
+    }
+    // ------------------------------------------------
+
+    // Start w worker threads
+    // ------------------------------------------------
+    RequestChannel *req_channel;
+    string reply;
+    WORK_THREAD_PARAMS *w_t_params;
+
+    for (int i = 0; i < num_worker_threads; ++i) {
+        reply = chan.send_request("newthread");
+        cout << "Reply to request for new thread is '" << reply << "'" << endl;
+
+        req_channel = new RequestChannel(reply, RequestChannel::CLIENT_SIDE);
+
+        w_t_params = new WORK_THREAD_PARAMS{
+                work_buffer,  // BoundedBuffer buff;
+                stats_buffer, // SBB_Container
+                req_channel   // RequestChannel;
+        };
+
+        pthread_create(&worker_threads[i], NULL, worker_thread_func, (void *) w_t_params);
+    }
     // ------------------------------------------------
 
     // Wait for request threads to finish
     for (int j = 0; j < NUM_PEOPLE; ++j) {
-        pthread_join(request_threads[j],NULL);
+        pthread_join(request_threads[j], NULL);
     }
 
     // Kill the workers
-    for (int i=0; i< num_worker_threads;++i) {
+    for (int i = 0; i < num_worker_threads; ++i) {
         work_buffer->Deposit("quit");
     }
 
-    //Wait for worker threads to exit
-    for (int i=0; i < num_worker_threads; ++i) {
+    // Wait for worker threads to exit
+    for (int i = 0; i < num_worker_threads; ++i) {
         pthread_join(worker_threads[i], NULL);
+    }
+
+    // Wait for stat threads to exit
+    for (int i=0; i < NUM_PEOPLE; ++i) {
+        pthread_join(stat_threads[i], NULL);
     }
 
     // CLose Control
@@ -203,6 +215,11 @@ int main(int argc, char **argv) {
     cout << "Control Reply to request 'quit' is '" << reply4 << "'" << endl;
 
     usleep(1000000);
+
+    // Print the Histograms
+    for (int i = JOHN; i <= JOE; ++i) {
+        print_histogram(names[i], HISTOGRAM[i]);
+    }
 }
 
 
@@ -217,11 +234,17 @@ void *request_thread_func(void *req_args) {
 }
 
 void *build_hist(void *func_params) {
-//    STATS_PARAMS *params = (STATS_PARAMS *) func_params;
-//    for (int i = 0; i < params->n; i++) {
-//        string req = "data" + params->patient_name;
-//        params->buff.Deposit(req);
-//    }
+    STATS_PARAMS *params = (STATS_PARAMS *) func_params;
+    string item;
+    cout << "Building Histograms for " << names[params->patient_index] << endl;
+    int bin_index;
+    int value;
+    for (int i = 0; i < params->n; i++) {
+        item = params->buff->Remove();
+        value = atoi(item.c_str());
+        bin_index = (int) (floor(value / 10));
+        HISTOGRAM[params->patient_index][bin_index] += 1;
+    }
     return 0;
 }
 
@@ -235,8 +258,25 @@ void *worker_thread_func(void *func_params) {
         if (req == "quit") {
             break;
         }
-//        SBB *sbb = lookup(req, SSB_container);
-//        ssb->deposit(reply);
+        BoundedBuffer<string> *sbb = lookup(req, params->SSB_container);
+        sbb->Deposit(reply);
     }
     return 0;
+}
+
+BoundedBuffer<string> *lookup(string req, BoundedBuffer<string> **SBB_container) {
+    for (int i = JOHN; i <= JOE; ++i) {
+        size_t found = req.find(names[i]);
+        if (found != std::string::npos) {
+            cout << "Depositing " << req << " into stat buffer for " << names[i] << endl;
+            return SBB_container[i];
+        }
+    }
+}
+
+void print_histogram(string name, int data[]) {
+    cout << endl << endl <<  "Histogram for " << name << endl << endl;
+    for (int i = 0; i < 100; i += 10) {
+        cout << "[" << i << ", " << i + 9 << "]: " << data[i/10] << endl;
+    }
 }
