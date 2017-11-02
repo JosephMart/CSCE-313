@@ -5,7 +5,6 @@
 #include <zconf.h>
 #include <vector>
 #include <bits/unique_ptr.h>
-#include <pthread.h>
 #include "reqchannel.H"
 
 
@@ -47,7 +46,7 @@ string names[] = {"John Doe", "Jane Smith", "Joe Smith"};
 /*--------------------------------------------------------------------------*/
 /* FORWARDS */
 /*--------------------------------------------------------------------------*/
-void request_thread_func(void *req_args);
+void* request_thread_func(void *req_args);
 
 void build_hist(void *func_params);
 
@@ -151,10 +150,12 @@ int main(int argc, char **argv) {
 
     // Create Req Params
     for (int i = JOHN; i <= JOE; ++i) {
+        cout << "Generating Request thread for " << names[i] << endl;
         req_params[i] = unique_ptr<REQ_PARAMS> (new REQ_PARAMS{
                 names[i],           // Patient name
                 num_worker_threads// Num of Worker Threads
         });
+        pthread_create(&request_threads[i], NULL, request_thread_func, (void*) req_params);
     }
     // ------------------------------------------------
 
@@ -178,12 +179,13 @@ int main(int argc, char **argv) {
 }
 
 
-void request_thread_func(void *req_args) {
+void* request_thread_func(void *req_args) {
     REQ_PARAMS *params = (REQ_PARAMS *) req_args;
     for (int i = 0; i < params->n; i++) {
         string req = "data" + params->patient_name;
 //        params->buff->deposit(req);
     }
+    return 0;
 }
 
 // statistics thread
@@ -203,4 +205,5 @@ void* worker_thread_func(void *func_params) {
 //        SBB *sbb = lookup(req, SSB_container);
 //        ssb->deposit(reply);
 //    }
+    return 0;
 }
