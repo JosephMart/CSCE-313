@@ -8,6 +8,6 @@ set(SOURCE_FILES
         reqchannel.C
         reqchannel.H
         semaphore.H
-        simpleclient.C)
+        simpleclient.C semaphore.cpp client.cpp)
 
 add_executable(mp3 ${SOURCE_FILES})

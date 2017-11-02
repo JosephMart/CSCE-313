@@ -1,12 +1,19 @@
 # makefile
+CXXFLAGS = -Wall -Wextra -pedantic
 
-all: dataserver simpleclient
+all: dataserver client
 
-reqchannel.o: reqchannel.H reqchannel.C
-	g++ -c -g reqchannel.C
+clean:
+	rm client simpleclient dataserver *.o
 
-dataserver: dataserver.C reqchannel.o 
-	g++ -g -o dataserver dataserver.C reqchannel.o -lpthread
+reqchannel.o: reqchannel.H reqchannel.cc
+	g++ $(CXXFLAGS) -c -g reqchannel.cc
 
-simpleclient: simpleclient.C reqchannel.o
-	g++ -g -o simpleclient simpleclient.C reqchannel.o
+dataserver: dataserver.cc reqchannel.o 
+	g++ $(CXXFLAGS) -g -o dataserver dataserver.cc reqchannel.o -lpthread
+
+simpleclient: simpleclient.cc reqchannel.o
+	g++ $(CXXFLAGS) -g -o simpleclient simpleclient.cc reqchannel.o
+
+client: client.cc reqchannel.o
+	g++ $(CXXFLAGS) -g -o client client.cc reqchannel.o
