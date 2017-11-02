@@ -1,5 +1,5 @@
 CC = g++
-CXXFLAGS = -std=c++14
+CXXFLAGS = -std=c++11
 
 all: dataserver client
 
