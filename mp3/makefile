@@ -22,4 +22,4 @@ BoundedBufferUnitTests: BoundedBufferUnitTests.cc BoundedBuffer.h mutex.o semaph
 	$(CC) $(CXXFLAGS) -g -o BoundedBufferUnitTests BoundedBufferUnitTests.cc BoundedBuffer.h mutex.o semaphore.o -lpthread
 
 clean:
-	rm -rf client dataserver BoundedBufferUnitTests *.o
+	rm -rf client dataserver BoundedBufferUnitTests *.o fifo*

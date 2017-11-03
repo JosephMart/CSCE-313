@@ -302,6 +302,6 @@ void print_histogram(string name, int data[]) {
         for (int j = 0; j < data[i/10]; ++j) {
             cout << '*';
         }
-        cout << '\n';
+        cout << '\n' << setw(' ');
     }
 }
