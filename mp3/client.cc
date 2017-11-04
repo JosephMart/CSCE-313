@@ -4,8 +4,8 @@
 #include <zconf.h>
 #include <vector>
 #include <cmath>
-#include <sys/time.h>
 #include <iomanip>
+#include <sys/wait.h>
 #include "reqchannel.H"
 #include "BoundedBuffer.h"
 
@@ -204,11 +204,23 @@ int main(int argc, char **argv) {
     clock_t end = clock();
     double elapsed_time = double(end - begin) / CLOCKS_PER_SEC;
 
-    // CLose Control
+    // ------------------------------------------------
+    // Clean up on Aisle 4!
+    //------------------------------------------------
+    // Close Control
     string reply4 = chan.send_request("quit");
     cout << "Control Reply to request 'quit' is '" << reply4 << "'" << '\n';
+    clean_up(req_params, 3);
+    clean_up(stats_buffer, 3);
+    clean_up(stat_params, 3);
+    clean_up(w_t_params, num_worker_threads);
+    // Loop because templating didn't work for RequestThread :(
+    for (int k = 0; k < num_worker_threads; ++k) {
+        delete req_channel[k];
+    }
 
-    usleep(1000000);
+    // Wait for Data Server process to end
+    wait(NULL);
 
     // Print the Histograms
     cout << setfill('-') << setw(40) << '\n'
@@ -229,17 +241,6 @@ int main(int argc, char **argv) {
          << "Buffer Size: " << buffer_size << '\n'
          << "Number of Worker Threads: " << num_worker_threads << '\n'
          << "Requests Run Time: " << elapsed_time << " sec " << '\n';
-    // ------------------------------------------------
-    // Clean up on Aisle 4!
-    // ------------------------------------------------
-//    clean_up(req_params, 3);
-//    clean_up(stats_buffer, 3);
-//    clean_up(stat_params, 3);
-//    clean_up(w_t_params, num_worker_threads);
-//    // Loop because templating didn't work for RequestThread :(
-//    for (int k = 0; k < num_worker_threads; ++k) {
-//        delete req_channel[k];
-//    }
 }
 
 void *request_thread_func(void *req_args) {
