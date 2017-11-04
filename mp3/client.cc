@@ -1,6 +1,5 @@
 #include <getopt.h>
 #include <cstdlib>
-#include <cstdio>
 #include <iostream>
 #include <zconf.h>
 #include <vector>
@@ -9,7 +8,6 @@
 #include <iomanip>
 #include "reqchannel.H"
 #include "BoundedBuffer.h"
-
 
 using namespace std;
 
@@ -20,6 +18,11 @@ using namespace std;
 #define NUM_PEOPLE 3
 #define NUM_BINS 10
 #define MAX_WORKER_THREADS 126
+
+enum people {
+    JOHN, JANE, JOE
+};
+string names[] = {"John Doe", "Jane Smith", "Joe Smith"};
 
 /*--------------------------------------------------------------------------*/
 /* DATA STRUCTURES */
@@ -43,12 +46,6 @@ typedef struct work_thread_params {
     RequestChannel *chan;
 } WORK_THREAD_PARAMS;
 
-
-enum people {
-    JOHN, JANE, JOE
-};
-string names[] = {"John Doe", "Jane Smith", "Joe Smith"};
-
 int HISTOGRAM[NUM_PEOPLE][NUM_BINS];
 
 /*--------------------------------------------------------------------------*/
@@ -64,9 +61,10 @@ BoundedBuffer<string> *lookup(string req, BoundedBuffer<string> **SBB_container)
 
 void print_histogram(string name, int data[]);
 
+template<typename T>
+void clean_up(T *array, int _size);
 
 int main(int argc, char **argv) {
-//    setbuf(stdout, NULL);
     int c = 0;
     extern char *optarg;
 
@@ -100,7 +98,6 @@ int main(int argc, char **argv) {
     // Create threads passed on passed param
     pthread_t worker_threads[num_worker_threads];
 
-
     // Start the dataserver
     pid_t id = fork();
     if (id < 0) {
@@ -120,79 +117,70 @@ int main(int argc, char **argv) {
     RequestChannel chan("control", RequestChannel::CLIENT_SIDE);
     cout << "done." << '\n';
     // ------------------------------------------------
-
-    // Setup timers
+    // Setup timer
     // ------------------------------------------------
-    timeval begin, end;
-    gettimeofday(&begin, NULL);
+    clock_t begin = clock();
     // ------------------------------------------------
-
     // Create worker bounded buffer
     // ------------------------------------------------
     BoundedBuffer<string> *work_buffer = new BoundedBuffer<string>(buffer_size);
     // ------------------------------------------------
-
     // Start request threads (1 for each patient)
     // ------------------------------------------------
-    REQ_PARAMS *req_params;
+    REQ_PARAMS *req_params[NUM_PEOPLE];
 
     // Create Req Params
     for (int i = JOHN; i <= JOE; ++i) {
         cout << "Generating Request thread for " << names[i] << '\n';
-        req_params = new REQ_PARAMS{
+        req_params[i] = new REQ_PARAMS{
                 names[i],           // Patient name
                 req_per_person,// Num of Worker Threads
                 work_buffer
         };
-        pthread_create(&request_threads[i], NULL, request_thread_func, (void *) req_params);
+        pthread_create(&request_threads[i], NULL, request_thread_func, (void *) req_params[i]);
     }
     // ------------------------------------------------
-
     // Create Statistic bounded buffer
     // ------------------------------------------------
     BoundedBuffer<string> *stats_buffer[NUM_PEOPLE];
     // ------------------------------------------------
-
     // Start statistic threads (1 for each patient)
     // ------------------------------------------------
-    STATS_PARAMS *stat_params;
+    STATS_PARAMS *stat_params[NUM_PEOPLE];
 
     for (int i = JOHN; i <= JOE; ++i) {
         cout << "Generating Statistic thread for " << names[i] << '\n';
         stats_buffer[i] = new BoundedBuffer<string>(req_per_person);
-        stat_params = new STATS_PARAMS{
+        stat_params[i] = new STATS_PARAMS{
                 i,        // Patient name
                 req_per_person,  // Number of request
                 stats_buffer[i]  // Stats Buffer
         };
-
-        pthread_create(&stat_threads[i], NULL, build_hist, (void *) stat_params);
+        pthread_create(&stat_threads[i], NULL, build_hist, (void *) stat_params[i]);
     }
     // ------------------------------------------------
-
     // Start w worker threads
     // ------------------------------------------------
-    RequestChannel *req_channel;
+    RequestChannel *req_channel[num_worker_threads];
     string reply;
-    WORK_THREAD_PARAMS *w_t_params;
+    WORK_THREAD_PARAMS *w_t_params[num_worker_threads];
 
     for (int i = 0; i < num_worker_threads; ++i) {
         reply = chan.send_request("newthread");
         cout << "Reply to request for new thread is '" << reply << "'" << '\n';
 
-        req_channel = new RequestChannel(reply, RequestChannel::CLIENT_SIDE);
+        req_channel[i] = new RequestChannel(reply, RequestChannel::CLIENT_SIDE);
 
-        w_t_params = new WORK_THREAD_PARAMS{
+        w_t_params[i] = new WORK_THREAD_PARAMS{
                 work_buffer,  // BoundedBuffer buff;
                 stats_buffer, // SBB_Container
-                req_channel   // RequestChannel;
+                req_channel[i]   // RequestChannel;
         };
-
-        pthread_create(&worker_threads[i], NULL, worker_thread_func, (void *) w_t_params);
+        pthread_create(&worker_threads[i], NULL, worker_thread_func, (void *) w_t_params[i]);
     }
     // ------------------------------------------------
-
     // Wait for request threads to finish
+    // ------------------------------------------------
     for (int j = 0; j < NUM_PEOPLE; ++j) {
         pthread_join(request_threads[j], NULL);
     }
@@ -213,7 +201,8 @@ int main(int argc, char **argv) {
     }
 
     // Time end of Requests
-    gettimeofday(&end, NULL);
+    clock_t end = clock();
+    double elapsed_time = double(end - begin) / CLOCKS_PER_SEC;
 
     // CLose Control
     string reply4 = chan.send_request("quit");
@@ -230,7 +219,6 @@ int main(int argc, char **argv) {
     for (int i = JOHN; i <= JOE; ++i) {
         print_histogram(names[i], HISTOGRAM[i]);
     }
-
     // Print Data
     cout << '\n' << setfill('-') << setw(40) << '\n'
          << setfill(' ')
@@ -240,8 +228,18 @@ int main(int argc, char **argv) {
          << "Requests per Person: " << req_per_person << '\n'
          << "Buffer Size: " << buffer_size << '\n'
          << "Number of Worker Threads: " << num_worker_threads << '\n'
-         << "Requests Run Time: " << end.tv_sec - begin.tv_sec << " sec " << end.tv_usec - begin.tv_usec
-         << " musec" << '\n';
+         << "Requests Run Time: " << elapsed_time << " sec " << '\n';
+    // ------------------------------------------------
+    // Clean up on Aisle 4!
+    // ------------------------------------------------
+//    clean_up(req_params, 3);
+//    clean_up(stats_buffer, 3);
+//    clean_up(stat_params, 3);
+//    clean_up(w_t_params, num_worker_threads);
+//    // Loop because templating didn't work for RequestThread :(
+//    for (int k = 0; k < num_worker_threads; ++k) {
+//        delete req_channel[k];
+//    }
 }
 
 void *request_thread_func(void *req_args) {
@@ -258,8 +256,7 @@ void *build_hist(void *func_params) {
     STATS_PARAMS *params = (STATS_PARAMS *) func_params;
     string item;
     cout << "Building Histograms for " << names[params->patient_index] << '\n';
-    int bin_index;
-    int value;
+    int bin_index, value;
     for (int i = 0; i < params->n; i++) {
         item = params->buff->Remove();
         value = atoi(item.c_str());
@@ -298,11 +295,18 @@ BoundedBuffer<string> *lookup(string req, BoundedBuffer<string> **SBB_container)
 void print_histogram(string name, int data[]) {
     cout << '\n' << "Histogram for " << name << '\n' << '\n';
     for (int i = 0; i < 100; i += 10) {
-        cout << setw(7) << "[" << setw(2) << setfill('0') << i << ", " << setw(2) << setfill('0') << i + 9 << "]: "
-             << setfill(' ');
+        cout << setw(7) << "[" << setw(2) << setfill('0') << i << ", "
+             << setw(2) << setfill('0') << i + 9 << "]: " << setfill(' ');
         for (int j = 0; j < data[i / 10]; ++j) {
             cout << '*';
         }
         cout << '\n';
+    }
+}
+
+template<typename T>
+void clean_up(T *array, int _size) {
+    for (int i = 0; i < _size; ++i) {
+        delete array[i];
     }
 }
