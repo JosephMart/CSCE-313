@@ -101,16 +101,16 @@ int main(int argc, char **argv) {
     pthread_t worker_thread;
 
     // Start the dataserver
-//    pid_t id = fork();
-//    if (id < 0) {
-//        cerr << "Failed to fork." << '\n';
-//        exit(1);
-//    }
-//
-//    if (id == 0) {
-//        execv("./dataserver", 0);
-//        _exit(1);
-//    }
+    pid_t id = fork();
+    if (id < 0) {
+        cerr << "Failed to fork." << '\n';
+        exit(1);
+    }
+
+    if (id == 0) {
+        execv("./dataserver", 0);
+        _exit(1);
+    }
 
     // Start Connection to data server
     // ------------------------------------------------
