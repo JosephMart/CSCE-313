@@ -1,0 +1,35 @@
+{
+    "child": {
+        "child1": {
+            "directory": "\/home\/joseph\/projects\/CSCE-313\/mp5",
+            "height": 1006,
+            "profile": "2b7c4080-0ddd-46c5-8f23-563fd3ba789d",
+            "readOnly": false,
+            "synchronizedInput": true,
+            "type": "Terminal",
+            "uuid": "7ed14d30-fa69-4732-86c6-416d36e800de",
+            "width": 960
+        },
+        "child2": {
+            "directory": "\/home\/joseph\/projects\/CSCE-313\/mp5",
+            "height": 1006,
+            "profile": "2b7c4080-0ddd-46c5-8f23-563fd3ba789d",
+            "readOnly": false,
+            "synchronizedInput": true,
+            "type": "Terminal",
+            "uuid": "8cfdeafc-4986-4ce9-87af-dbc34aca5a9d",
+            "width": 959
+        },
+        "orientation": 0,
+        "position": 50,
+        "ratio": 0.5,
+        "type": "Paned"
+    },
+    "height": 1006,
+    "name": "Default",
+    "synchronizedInput": false,
+    "type": "Session",
+    "uuid": "c0013995-e1ce-4a4d-8e1d-75cf3b2fb3da",
+    "version": "1.0",
+    "width": 1920
+}

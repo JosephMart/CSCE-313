@@ -19,7 +19,8 @@
 /* INCLUDES */
 /*--------------------------------------------------------------------------*/
 
-#include "reqchannel.H"
+#include "netreqchannel.H"
+// #include "reqchannel.H"
 #include <cassert>
 #include <cstring>
 #include <errno.h>
@@ -55,7 +56,8 @@ static int nthreads = 0;
 /* FORWARDS */
 /*--------------------------------------------------------------------------*/
 
-void handle_process_loop(RequestChannel &_channel);
+void *handle_process_loop(void *args);
+void *temp_func(void *) {}
 
 /*--------------------------------------------------------------------------*/
 /* LOCAL FUNCTIONS -- SUPPORT FUNCTIONS */
@@ -74,15 +76,15 @@ string int2string(int number)
 
 void *handle_data_requests(void *args)
 {
-    RequestChannel *data_channel = (RequestChannel *) args;
+    // NetReqChannel *data_channel = (NetReqChannel *) args;
 
     // -- Handle client requests on this channel.
 
-    handle_process_loop(*data_channel);
+    handle_process_loop(args);
 
     // -- Client has quit. We remove channel.
 
-    delete data_channel;
+    // delete data_channel;
     return 0;
 }
 
@@ -90,68 +92,70 @@ void *handle_data_requests(void *args)
 /* LOCAL FUNCTIONS -- INDIVIDUAL REQUESTS */
 /*--------------------------------------------------------------------------*/
 
-void process_hello(RequestChannel &_channel, __attribute__((unused)) const string &_request)
+void process_hello(NetReqChannel &_channel, __attribute__((unused)) const string &_request)
 {
     _channel.cwrite("hello to you too");
 }
 
-void process_data(RequestChannel &_channel, __attribute__((unused)) const string &_request)
+void process_data(NetReqChannel &_channel, __attribute__((unused)) const string &_request)
 {
     usleep(1000 + (rand() % 5000));
-    //_channel.cwrite("here comes data about " + _request.substr(4) + ": " + int2string(random() % 100));
+    // _channel.cwrite("here comes data about " + _request.substr(4) + ": " + int2string(random() % 100));
     _channel.cwrite(int2string(rand() % 100));
 }
 
-void process_newthread(RequestChannel &_channel, __attribute__((unused)) const string &_request)
-{
-    int error;
-    nthreads++;
+// void process_newthread(RequestChannel &_channel, __attribute__((unused)) const string &_request)
+// {
+//     int error;
+//     nthreads++;
 
-    // -- Name new data channel
+//     // -- Name new data channel
 
-    string new_channel_name = "data" + int2string(nthreads) + "_";
-    //  cout << "new channel name = " << new_channel_name << endl;
+//     string new_channel_name = "data" + int2string(nthreads) + "_";
+//     //  cout << "new channel name = " << new_channel_name << endl;
 
-    // -- Pass new channel name back to client
+//     // -- Pass new channel name back to client
 
-    _channel.cwrite(new_channel_name);
+//     _channel.cwrite(new_channel_name);
 
-    // -- Construct new data channel (pointer to be passed to thread function)
+//     // -- Construct new data channel (pointer to be passed to thread function)
 
-    RequestChannel *data_channel = new RequestChannel(new_channel_name, RequestChannel::SERVER_SIDE);
+//     RequestChannel *data_channel = new RequestChannel(new_channel_name, RequestChannel::SERVER_SIDE);
 
-    // -- Create new thread to handle request channel
+//     // -- Create new thread to handle request channel
 
-    pthread_t thread_id;
-    //  cout << "starting new thread " << nthreads << endl;
-    if ((error = pthread_create(&thread_id, NULL, handle_data_requests, data_channel))) {
-        fprintf(stderr, "p_create failed: %s\n", strerror(error));
-    }
-}
+//     pthread_t thread_id;
+//     //  cout << "starting new thread " << nthreads << endl;
+//     if ((error = pthread_create(&thread_id, NULL, handle_data_requests, data_channel))) {
+//         fprintf(stderr, "p_create failed: %s\n", strerror(error));
+//     }
+// }
 
 /*--------------------------------------------------------------------------*/
 /* LOCAL FUNCTIONS -- THE PROCESS REQUEST LOOP */
 /*--------------------------------------------------------------------------*/
 
-void process_request(RequestChannel &_channel, const string &_request)
+void process_request(NetReqChannel &_channel, const string &_request)
 {
     if (_request.compare(0, 5, "hello") == 0) {
         process_hello(_channel, _request);
     } else if (_request.compare(0, 4, "data") == 0) {
         process_data(_channel, _request);
-    } else if (_request.compare(0, 9, "newthread") == 0) {
-        process_newthread(_channel, _request);
+        // } else if (_request.compare(0, 9, "newthread") == 0) {
+        //     process_newthread(_channel, _request);
     } else {
         _channel.cwrite("unknown request");
     }
 }
 
-void handle_process_loop(RequestChannel &_channel)
+void *handle_process_loop(void *args)
 {
+    NetReqChannel _channel = *(NetReqChannel *) args;
+
     for (;;) {
-        cout << "Reading next request from channel (" << _channel.name() << ") ..." << flush;
+        // cout << "Reading next request from channel (" << _channel.name() << ") ..." << flush;
         string request = _channel.cread();
-        cout << " done (" << _channel.name() << ")." << endl;
+        // cout << " done (" << _channel.name() << ")." << endl;
         cout << "New request is " << request << endl;
 
         if (request.compare("quit") == 0) {
@@ -170,9 +174,23 @@ void handle_process_loop(RequestChannel &_channel)
 
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 {
+    // 2 params, -p port_num, -b backlog (listen function?) size of buffer
     //  cout << "Establishing control channel... " << flush;
-    RequestChannel control_channel("control", RequestChannel::SERVER_SIDE);
+    int c           = 0;     // Value for temp storage of param
+    int backlog     = 10;    // maybe 195
+    string port_num = "12005";
+
+    while ((c = getopt(argc, argv, "p:b:")) != -1) {
+        switch (c) {
+        case 'p':
+            port_num = strtoul(optarg, NULL, 10);
+            break;
+        default:
+            break;
+        }
+    }
+    NetReqChannel nrw = NetReqChannel(port_num, handle_process_loop);
     //  cout << "done.\n" << flush;
 
-    handle_process_loop(control_channel);
+    // handle_process_loop(control_channel);
 }

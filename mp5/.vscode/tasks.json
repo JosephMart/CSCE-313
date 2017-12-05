@@ -1,0 +1,19 @@
+{
+    "tasks": [
+        {
+            "label": "make",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "all"
+            ],
+            "presentation": {
+                "reveal": "silent"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

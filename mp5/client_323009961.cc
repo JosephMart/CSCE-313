@@ -1,4 +1,5 @@
 #include "BoundedBuffer.h"
+#include "netreqchannel.H"
 #include "reqchannel.H"
 #include <cmath>
 #include <cstdlib>
@@ -43,7 +44,8 @@ typedef struct work_thread_params {
     int num_requests;                         // Number of requests per patient
     BoundedBuffer<string> *buff;              // Buffer where requests are pulled from
     BoundedBuffer<string> **SSB_container;    // Buffer where stats requests are deposited
-    RequestChannel *ctl_chan;                 // Client Control Channel
+    string host_name;
+    string port_num;
 } WORK_THREAD_PARAMS;
 
 int HISTOGRAM[NUM_PEOPLE][NUM_BINS];    // Store the histograms for the patients
@@ -69,12 +71,14 @@ int main(int argc, char **argv)
     cout.setf(std::ios::unitbuf);
 
     extern char *optarg;
-    int c                    = 0;    // Value for temp storage of param
-    int req_per_person       = 0;    // (-n) number of data requests per person
-    int buffer_size          = 0;    // (-b) size of bounded buffer between request and worker threads
-    int num_request_channels = 0;    // (-w) number of worker threads
+    int c                    = 10;             // Value for temp storage of param
+    int req_per_person       = 10;             // (-n) number of data requests per person
+    int buffer_size          = 10;             // (-b) size of bounded buffer between request and worker threads
+    int num_request_channels = 10;             // (-w) number of worker threads
+    string port_num          = "12005";        // (-p) port number 9000-15000
+    string host_name         = "localhost";    // (-h) host name/"localhost"
 
-    while ((c = getopt(argc, argv, "n:b:w:")) != -1) {
+    while ((c = getopt(argc, argv, "n:b:w:p:h:")) != -1) {
         switch (c) {
         case 'n':
             req_per_person = (unsigned int) strtoul(optarg, NULL, 10);
@@ -85,10 +89,25 @@ int main(int argc, char **argv)
         case 'w':
             num_request_channels = (unsigned int) strtoul(optarg, NULL, 10);
             break;
+        case 'p':
+            port_num = strtoul(optarg, NULL, 10);
+            break;
+        case 'h':
+            host_name = strtoul(optarg, NULL, 10);
+            break;
         default:
             break;
         }
     }
+
+    // TESTING PURPOSES
+    // NetReqChannel nrc = NetReqChannel(host_name, port_num);
+    // nrc.cwrite("hello");
+    // cout << nrc.cread() << '\n';
+    // cout << nrc.send_request("quit") << '\n';
+    // return 0;
+
+    cout << req_per_person << endl;
 
     // Initialize the threads - One thread for each person
     pthread_t request_threads[NUM_PEOPLE];
@@ -97,24 +116,13 @@ int main(int argc, char **argv)
     // Create master worker thread
     pthread_t worker_thread;
 
-    // Start the dataserver
-    pid_t id = fork();
-    if (id < 0) {
-        cerr << "Failed to fork." << '\n';
-        exit(1);
-    }
-
-    if (id == 0) {
-        execv("./dataserver", argv);
-        _exit(1);
-    }
-
     // ------------------------------------------------
     // Start Connection to data server
     // ------------------------------------------------
     cout << "CLIENT STARTED:" << '\n';
     cout << "Establishing control channel... " << flush;
-    RequestChannel control_chan("control", RequestChannel::CLIENT_SIDE);
+    // NetReqChannel control_chan(host_name, port_num);
+    // RequestChannel control_chan("control", RequestChannel::CLIENT_SIDE);
     cout << "done." << '\n';
 
     // ------------------------------------------------
@@ -166,12 +174,12 @@ int main(int argc, char **argv)
     // ------------------------------------------------
     WORK_THREAD_PARAMS *w_t_params;
 
-    w_t_params = new WORK_THREAD_PARAMS{
-        num_request_channels, req_per_person * 3,
-        work_buffer,      // BoundedBuffer buff;
-        stats_buffer,     // SBB_Container
-        &control_chan,    // ControlChannel;
-    };
+    w_t_params = new WORK_THREAD_PARAMS{ num_request_channels,
+                                         req_per_person * 3,
+                                         work_buffer,     // BoundedBuffer buff;
+                                         stats_buffer,    // SBB_Container
+                                         host_name,
+                                         port_num };
 
     pthread_create(&worker_thread, NULL, worker_thread_func, (void *) w_t_params);
     // ------------------------------------------------
@@ -202,8 +210,8 @@ int main(int argc, char **argv)
     // Clean up on Aisle 4!
     //------------------------------------------------
     // Close Control
-    string reply4 = control_chan.send_request("quit");
-    cout << "Control Reply to request 'quit' is '" << reply4 << "'" << '\n';
+    // string reply4 = control_chan.send_request("quit");
+    // cout << "Control Reply to request 'quit' is '" << reply4 << "'" << '\n';
     cout << "Cleaning up Request Params\n";
     clean_up(req_params, 3);
     cout << "Cleaning up Stats Buffer\n";
@@ -232,6 +240,7 @@ int main(int argc, char **argv)
          << "Buffer Size: " << buffer_size << '\n'
          << "Number of Worker Threads: " << num_request_channels << '\n'
          << "Requests Run Time: " << elapsed_time << " sec " << '\n';
+    return 0;
 }
 
 void *request_thread_func(void *req_args)
@@ -265,8 +274,8 @@ void *build_hist(void *func_params)
 
 void *worker_thread_func(void *func_params)
 {
-    WORK_THREAD_PARAMS *params       = (WORK_THREAD_PARAMS *) func_params;
-    RequestChannel **requestChannels = new RequestChannel *[params->num_request_channels];
+    WORK_THREAD_PARAMS *params      = (WORK_THREAD_PARAMS *) func_params;
+    NetReqChannel **requestChannels = new NetReqChannel *[params->num_request_channels];
 
     string *requests = new string[params->num_request_channels];
 
@@ -275,13 +284,13 @@ void *worker_thread_func(void *func_params)
     int quit_count = 0;
 
     string reply;
-    RequestChannel *tmp_chan;
+    NetReqChannel *tmp_chan;
     fd_set read_fds;
 
     for (int i = 0; i < params->num_request_channels; ++i) {
-        params->ctl_chan->cwrite("newthread");
-        reply              = params->ctl_chan->cread();
-        requestChannels[i] = new RequestChannel(reply, RequestChannel::CLIENT_SIDE);
+        // params->ctl_chan->cwrite("newthread");
+        // reply              = params->ctl_chan->cread();
+        requestChannels[i] = new NetReqChannel(params->host_name, params->port_num);
 
         cout << "Creating newthread " << '\n';
         cout << "Response to newthread: "
@@ -320,6 +329,7 @@ void *worker_thread_func(void *func_params)
                 if (req.find("quit") != string::npos) {
                     cout << "Ending the Select Watcher" << endl;
                     quit_count++;
+                    cout << "QUIT COUNT " << quit_count << '\n';
 
                     if (quit_count == 3)
                         run = 0;
