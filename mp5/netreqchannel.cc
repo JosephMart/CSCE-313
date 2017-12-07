@@ -1,6 +1,7 @@
 #include "netreqchannel.H"
 #include <arpa/inet.h>
 #include <errno.h>
+#include <iostream>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <signal.h>
@@ -11,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <vector>
 
 #define BACKLOG 10         // how many pending connections queue will hold
 #define MAXDATASIZE 100    // max number of bytes we can get at once
@@ -73,7 +75,7 @@ NetReqChannel::NetReqChannel(const std::string server_host_name, std::string por
 }
 
 /* Server Constructor */
-NetReqChannel::NetReqChannel(const std::string port_no, void *(*connection_handler)(void *) )
+NetReqChannel::NetReqChannel(const std::string port_no, const int backlog, void *(*connection_handler)(void *) )
 {
     int new_fd;    // listen on sock_fd, new connection on new_fd
     struct addrinfo hints, *servinfo, *p;
@@ -124,23 +126,24 @@ NetReqChannel::NetReqChannel(const std::string port_no, void *(*connection_handl
         exit(1);
     }
     printf("server: waiting for connections...\n");
-    while (1) {
-        sin_size = sizeof their_addr;
-        new_fd   = accept(fd, (struct sockaddr *) &their_addr, &sin_size);
-        if (new_fd == -1) {
-            perror("accept");
-            continue;
-        }
+    sin_size = sizeof(their_addr);
+    vector<pthread_t> threads;
+
+    while ((new_fd = accept(fd, (struct sockaddr *) &their_addr, &sin_size)) >= 0) {
+        cout << "Starting a wonderful journey\n";
         inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *) &their_addr), s, sizeof s);
+        cout << "Inet complete\n";
         printf("server: got connection from %s\n", s);
-        if (!fork()) {    // this is the child process
-            close(fd);    // child doesn't need the listener
-            fd = new_fd;
-            (*connection_handler)((void *) this);
-            exit(0);
-        }
-        close(new_fd);    // parent doesn't need this
+        pthread_t hand;
+        threads.push_back(hand);
+        pthread_create(&hand, NULL, (*connection_handler), (void *) new_fd);
+        cout << "Created another thread\n";
     }
+
+    for (unsigned int i = 0; i < threads.size(); i++) {
+        pthread_join(threads.at(i), NULL);
+    }
+    wait(NULL);
 }
 
 NetReqChannel::~NetReqChannel()

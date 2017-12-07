@@ -92,16 +92,19 @@ void *handle_data_requests(void *args)
 /* LOCAL FUNCTIONS -- INDIVIDUAL REQUESTS */
 /*--------------------------------------------------------------------------*/
 
-void process_hello(NetReqChannel &_channel, __attribute__((unused)) const string &_request)
+void process_hello(int new_fd, __attribute__((unused)) const string &_request)
 {
-    _channel.cwrite("hello to you too");
+    const char *_msg = "hello to you too";
+    write(new_fd, _msg, strlen(_msg));
 }
 
-void process_data(NetReqChannel &_channel, __attribute__((unused)) const string &_request)
+void process_data(int new_fd, __attribute__((unused)) const string &_request)
 {
     usleep(1000 + (rand() % 5000));
     // _channel.cwrite("here comes data about " + _request.substr(4) + ": " + int2string(random() % 100));
-    _channel.cwrite(int2string(rand() % 100));
+
+    string _msg = int2string(rand() % 100);
+    write(new_fd, _msg.c_str(), strlen(_msg.c_str()));
 }
 
 // void process_newthread(RequestChannel &_channel, __attribute__((unused)) const string &_request)
@@ -135,36 +138,40 @@ void process_data(NetReqChannel &_channel, __attribute__((unused)) const string 
 /* LOCAL FUNCTIONS -- THE PROCESS REQUEST LOOP */
 /*--------------------------------------------------------------------------*/
 
-void process_request(NetReqChannel &_channel, const string &_request)
+void process_request(int new_fd, const string &_request)
 {
     if (_request.compare(0, 5, "hello") == 0) {
-        process_hello(_channel, _request);
+        process_hello(new_fd, _request);
     } else if (_request.compare(0, 4, "data") == 0) {
-        process_data(_channel, _request);
+        process_data(new_fd, _request);
         // } else if (_request.compare(0, 9, "newthread") == 0) {
         //     process_newthread(_channel, _request);
     } else {
-        _channel.cwrite("unknown request");
+        const char *notKnown = "unknown request";
+        write(new_fd, notKnown, strlen(notKnown));
     }
 }
 
 void *handle_process_loop(void *args)
 {
-    NetReqChannel _channel = *(NetReqChannel *) args;
+    int new_fd = *(int *) args;
 
     for (;;) {
+        char buf[255];
         // cout << "Reading next request from channel (" << _channel.name() << ") ..." << flush;
-        string request = _channel.cread();
+        read(new_fd, buf, 255);
         // cout << " done (" << _channel.name() << ")." << endl;
+        string request = buf;
         cout << "New request is " << request << endl;
 
         if (request.compare("quit") == 0) {
-            _channel.cwrite("bye");
+            const char *bye = "bye";
+            write(new_fd, bye, strlen(bye));
             usleep(10000);    // give the other end a bit of time.
             break;            // break out of the loop;
         }
 
-        process_request(_channel, request);
+        process_request(new_fd, request);
     }
 }
 
@@ -189,8 +196,8 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
             break;
         }
     }
-    NetReqChannel nrw = NetReqChannel(port_num, handle_process_loop);
-    //  cout << "done.\n" << flush;
+    NetReqChannel nrw = NetReqChannel(port_num, backlog, handle_process_loop);
+    cout << "done.\n" << flush;
 
     // handle_process_loop(control_channel);
 }

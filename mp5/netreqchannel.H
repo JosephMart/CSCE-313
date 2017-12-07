@@ -26,7 +26,7 @@ class NetReqChannel
      * closing the socket. You will have to close the socket once the
      * connection handler is done.
      */
-    NetReqChannel(const std::string port_no, void *(*connection_handler)(void *) );
+    NetReqChannel(const std::string port_no, const int backlog, void *(*connection_handler)(void *) );
 
     /* Destructor of the local copy of the channel. */
     ~NetReqChannel();
