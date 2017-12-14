@@ -20,7 +20,6 @@
 /*--------------------------------------------------------------------------*/
 
 #include "netreqchannel.H"
-// #include "reqchannel.H"
 #include <cassert>
 #include <cstring>
 #include <errno.h>
@@ -50,14 +49,11 @@ using namespace std;
 /* VARIABLES */
 /*--------------------------------------------------------------------------*/
 
-static int nthreads = 0;
-
 /*--------------------------------------------------------------------------*/
 /* FORWARDS */
 /*--------------------------------------------------------------------------*/
 
 void *handle_process_loop(void *args);
-void *temp_func(void *) {}
 
 /*--------------------------------------------------------------------------*/
 /* LOCAL FUNCTIONS -- SUPPORT FUNCTIONS */
@@ -107,33 +103,6 @@ void process_data(int new_fd, __attribute__((unused)) const string &_request)
     write(new_fd, _msg.c_str(), strlen(_msg.c_str()));
 }
 
-// void process_newthread(RequestChannel &_channel, __attribute__((unused)) const string &_request)
-// {
-//     int error;
-//     nthreads++;
-
-//     // -- Name new data channel
-
-//     string new_channel_name = "data" + int2string(nthreads) + "_";
-//     //  cout << "new channel name = " << new_channel_name << endl;
-
-//     // -- Pass new channel name back to client
-
-//     _channel.cwrite(new_channel_name);
-
-//     // -- Construct new data channel (pointer to be passed to thread function)
-
-//     RequestChannel *data_channel = new RequestChannel(new_channel_name, RequestChannel::SERVER_SIDE);
-
-//     // -- Create new thread to handle request channel
-
-//     pthread_t thread_id;
-//     //  cout << "starting new thread " << nthreads << endl;
-//     if ((error = pthread_create(&thread_id, NULL, handle_data_requests, data_channel))) {
-//         fprintf(stderr, "p_create failed: %s\n", strerror(error));
-//     }
-// }
-
 /*--------------------------------------------------------------------------*/
 /* LOCAL FUNCTIONS -- THE PROCESS REQUEST LOOP */
 /*--------------------------------------------------------------------------*/
@@ -144,7 +113,7 @@ void process_request(int new_fd, const string &_request)
         process_hello(new_fd, _request);
     } else if (_request.compare(0, 4, "data") == 0) {
         process_data(new_fd, _request);
-        // } else if (_request.compare(0, 9, "newthread") == 0) {
+        // } else if (_request.compare(0, 4, "quit") == 0) {
         //     process_newthread(_channel, _request);
     } else {
         const char *notKnown = "unknown request";
@@ -173,6 +142,9 @@ void *handle_process_loop(void *args)
 
         process_request(new_fd, request);
     }
+
+    cout << "Connection Terminated\n";
+    return 0;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -186,16 +158,24 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     int c           = 0;     // Value for temp storage of param
     int backlog     = 10;    // maybe 195
     string port_num = "12005";
+    extern char *optarg;
 
     while ((c = getopt(argc, argv, "p:b:")) != -1) {
+        std::stringstream in;
         switch (c) {
         case 'p':
-            port_num = strtoul(optarg, NULL, 10);
+            in << optarg;
+            in >> port_num;
+            break;
+        case 'b':
+            in << optarg;
+            in >> backlog;
             break;
         default:
             break;
         }
     }
+    cout << "Data Server Started\n";
     NetReqChannel nrw = NetReqChannel(port_num, backlog, handle_process_loop);
     cout << "done.\n" << flush;
 

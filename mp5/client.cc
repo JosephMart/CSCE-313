@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 #include <zconf.h>
@@ -79,6 +80,7 @@ int main(int argc, char **argv)
     string host_name         = "localhost";    // (-h) host name/"localhost"
 
     while ((c = getopt(argc, argv, "n:b:w:p:h:")) != -1) {
+        std::stringstream in;
         switch (c) {
         case 'n':
             req_per_person = (unsigned int) strtoul(optarg, NULL, 10);
@@ -90,22 +92,17 @@ int main(int argc, char **argv)
             num_request_channels = (unsigned int) strtoul(optarg, NULL, 10);
             break;
         case 'p':
-            port_num = strtoul(optarg, NULL, 10);
+            in << optarg;
+            in >> port_num;
             break;
         case 'h':
-            host_name = strtoul(optarg, NULL, 10);
+            in << optarg;
+            in >> host_name;
             break;
         default:
             break;
         }
     }
-
-    // TESTING PURPOSES
-    // NetReqChannel nrc = NetReqChannel(host_name, port_num);
-    // nrc.cwrite("hello");
-    // cout << nrc.cread() << '\n';
-    // cout << nrc.send_request("quit") << '\n';
-    // return 0;
 
     cout << req_per_person << endl;
 
@@ -120,15 +117,6 @@ int main(int argc, char **argv)
     // Start Connection to data server
     // ------------------------------------------------
     cout << "CLIENT STARTED:" << '\n';
-    cout << "Establishing control channel... " << flush;
-    // NetReqChannel control_chan(host_name, port_num);
-    // RequestChannel control_chan("control", RequestChannel::CLIENT_SIDE);
-    cout << "done." << '\n';
-
-    // ------------------------------------------------
-    // Setup timer
-    // ------------------------------------------------
-    clock_t begin = clock();
 
     // ------------------------------------------------
     // Create worker bounded buffer
@@ -189,29 +177,18 @@ int main(int argc, char **argv)
         pthread_join(request_threads[j], NULL);
     }
 
-    // Kill the workers
-    //    for (int i = 0; i < num_request_channels; ++i) {
-    //        work_buffer->Deposit("quit");
-    //    }
-    //    work_buffer->Deposit("quit");
     // Wait for worker thread to exit
     pthread_join(worker_thread, NULL);
+    cout << "WORKER THREAD DONE";
 
     // Wait for stat threads to exit
     for (int i = 0; i < NUM_PEOPLE; ++i) {
         pthread_join(stat_threads[i], NULL);
     }
 
-    // Time end of Requests
-    clock_t end         = clock();
-    double elapsed_time = double(end - begin) / CLOCKS_PER_SEC;
-
     // ------------------------------------------------
     // Clean up on Aisle 4!
     //------------------------------------------------
-    // Close Control
-    // string reply4 = control_chan.send_request("quit");
-    // cout << "Control Reply to request 'quit' is '" << reply4 << "'" << '\n';
     cout << "Cleaning up Request Params\n";
     clean_up(req_params, 3);
     cout << "Cleaning up Stats Buffer\n";
@@ -219,9 +196,6 @@ int main(int argc, char **argv)
     cout << "Cleaning up Stats Params\n";
     clean_up(stat_params, 3);
     delete w_t_params;
-
-    // Wait for Data Server process to end
-    // wait(NULL);
 
     // Print the Histograms
     cout << setfill('-') << setw(40) << '\n'
@@ -238,8 +212,7 @@ int main(int argc, char **argv)
          << setfill('-') << setw(40) << '\n'
          << setfill(' ') << "Requests per Person: " << req_per_person << '\n'
          << "Buffer Size: " << buffer_size << '\n'
-         << "Number of Worker Threads: " << num_request_channels << '\n'
-         << "Requests Run Time: " << elapsed_time << " sec " << '\n';
+         << "Number of Worker Threads: " << num_request_channels << '\n';
     return 0;
 }
 
@@ -262,13 +235,19 @@ void *build_hist(void *func_params)
     string item;
     cout << "Building Histograms for " << names[params->patient_index] << '\n';
     int bin_index, value;
-    for (int i = 0; i < params->n; i++) {
-        //    for(;;) {
-        item      = params->buff->Remove();
-        value     = atoi(item.c_str());
+    // for (int i = 0; i < params->n; i++) {
+    for (;;) {
+        item  = params->buff->Remove();
+        value = atoi(item.c_str());
+        cout << value << endl;
+
+        if (value == -1) {
+            break;
+        }
         bin_index = (int) (floor(value / 10));
         HISTOGRAM[params->patient_index][bin_index] += 1;
     }
+    cout << "Histograms built for " << names[params->patient_index] << '\n';
     return 0;
 }
 
@@ -293,8 +272,8 @@ void *worker_thread_func(void *func_params)
         requestChannels[i] = new NetReqChannel(params->host_name, params->port_num);
 
         cout << "Creating newthread " << '\n';
-        cout << "Response to newthread: "
-             << " --- " << reply << '\n';
+        // cout << "Response to newthread: "
+        //      << " --- " << reply << '\n';
 
         requestChannels[i]->cwrite("hello");
         requests[i] = "null";
@@ -331,8 +310,15 @@ void *worker_thread_func(void *func_params)
                     quit_count++;
                     cout << "QUIT COUNT " << quit_count << '\n';
 
-                    if (quit_count == 3)
+                    if (quit_count == 3) {
+                        // End the stats bounded buffer
+                        for (int n = 0; n < 3; n++) {
+                            BoundedBuffer<string> *sbb = lookup(names[n], params->SSB_container);
+                            sbb->Deposit("-1");
+                        }
                         run = 0;
+                        cout << "ENDING\n";
+                    }
                 } else {
                     string reply = tmp_chan->send_request(req);
                     tmp_chan->cwrite(req);
@@ -348,12 +334,12 @@ void *worker_thread_func(void *func_params)
     for (int i = 0; i < params->num_request_channels; ++i) {
         cout << "Quiting" << endl;
         requestChannels[i]->cwrite("quit");
-        reply = requestChannels[i]->cread();
-        cout << reply << endl;
+        // reply = requestChannels[i]->cread();
+        // cout << reply << endl;
         delete requestChannels[i];
     }
-
     delete[] requestChannels;
+    cout << "Ending Worker Thread\n";
     return 0;
 }
 

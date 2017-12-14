@@ -9,17 +9,14 @@ mutex.o: mutex.H mutex.cc
 semaphore.o: semaphore.cc semaphore.H
 	$(CC) $(CXXFLAGS) -c -g semaphore.cc -lpthread
 
-reqchannel.o: reqchannel.H reqchannel.cc
-	$(CC) $(CXXFLAGS) -c -g reqchannel.cc
-
 netreqchannel.o: netreqchannel.H netreqchannel.cc
 	$(CC) $(CXXFLAGS) -c -g netreqchannel.cc
 
-dataserver: dataserver.cc reqchannel.o netreqchannel.o
-	$(CC) $(CXXFLAGS) -g -o dataserver dataserver.cc reqchannel.o netreqchannel.o -lpthread
+dataserver: dataserver.cc netreqchannel.o
+	$(CC) $(CXXFLAGS) -g -o dataserver dataserver.cc netreqchannel.o -lpthread
 
-client: client.cc reqchannel.o BoundedBuffer.h mutex.o semaphore.o netreqchannel.o
-	$(CC) $(CXXFLAGS) -g -o client client.cc reqchannel.o BoundedBuffer.h mutex.o semaphore.o netreqchannel.o -lpthread
+client: client.cc BoundedBuffer.h mutex.o semaphore.o netreqchannel.o
+	$(CC) $(CXXFLAGS) -g -o client client.cc BoundedBuffer.h mutex.o semaphore.o netreqchannel.o -lpthread
 
 BoundedBufferUnitTests: BoundedBufferUnitTests.cc BoundedBuffer.h mutex.o semaphore.o
 	$(CC) $(CXXFLAGS) -g -o BoundedBufferUnitTests BoundedBufferUnitTests.cc BoundedBuffer.h mutex.o semaphore.o -lpthread
